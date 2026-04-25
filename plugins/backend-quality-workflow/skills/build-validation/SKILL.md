@@ -8,9 +8,11 @@ argument-hint: "[빌드, CI, 검증 작업]"
 
 ## 설명
 
-`$ARGUMENTS`가 build, test, generated source, dependency, CI validation과 관련될 때 사용한다. Gradle/Maven, protobuf generation, lint/static analysis, compile/test failure를 다룬다.
+사용자 요청이 build, test, generated source, dependency, CI validation과 관련될 때 사용한다. Gradle/Maven, protobuf generation, lint/static analysis, compile/test failure를 다룬다.
 
 ## 상세 자료
+
+아래 자료는 필요한 경우에만, 나열된 순서로 읽는다.
 
 - `${CLAUDE_PLUGIN_ROOT}/references/build-validation.md`
 - Gradle/Kotlin/Spring 프로젝트면 `${CLAUDE_PLUGIN_ROOT}/references/spring-kotlin-backend.md`
@@ -30,6 +32,7 @@ argument-hint: "[빌드, CI, 검증 작업]"
 
 ## 주의사항
 
+- 실수 방지 가드레일: 빌드/검증 명령을 바꾸면 README/INSTALL과 회귀 테스트 명령도 같이 맞춘다.
 - 첫 번째 의미 있는 실패를 기준으로 원인을 좁힌다.
 - 환경/네트워크 제약으로 실행 불가하면 residual risk를 명시한다.
 

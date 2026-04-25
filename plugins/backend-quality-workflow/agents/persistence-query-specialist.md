@@ -15,6 +15,8 @@ permissionMode: default
 
 ## 상세 자료
 
+아래 자료는 필요한 경우에만, 나열된 순서로 읽습니다.
+
 - `${CLAUDE_PLUGIN_ROOT}/references/persistence-query-patterns.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/performance-checklist.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/security-checklist.md`
@@ -22,6 +24,7 @@ permissionMode: default
 
 ## 실행 규칙
 
+- 실수 방지 가드레일로 쿼리 변경의 result correctness, ownership boundary, pagination/limit 회귀 테스트를 함께 봅니다.
 - bounded read, pagination, explicit projection, 적절한 fetch join/entity graph, parameter binding을 우선합니다.
 - data access 근처에서 authorization filter와 tenant/account scoping을 확인합니다.
 - mapper, serializer, logging, loop 안에 lazy load를 숨기지 않습니다.

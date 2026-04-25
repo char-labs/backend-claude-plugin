@@ -9,9 +9,11 @@ disable-model-invocation: true
 
 ## 설명
 
-`$ARGUMENTS`를 안전한 Git 작업으로 처리한다. 이 skill은 자동 호출을 막고, 사용자가 명시적으로 Git 작업을 요청한 경우에만 사용한다.
+사용자 요청을 안전한 Git 작업으로 처리한다. 이 skill은 자동 호출을 막고, 사용자가 명시적으로 Git 작업을 요청한 경우에만 사용한다.
 
 ## 상세 자료
+
+아래 자료는 필요한 경우에만, 나열된 순서로 읽는다.
 
 - `${CLAUDE_PLUGIN_ROOT}/scripts/detect-validation-tools.py`
 
@@ -32,6 +34,7 @@ disable-model-invocation: true
 
 ## 주의사항
 
+- 실수 방지 가드레일: stage 전후 상태와 diff 범위를 확인하고, 관련 없는 사용자 변경을 커밋에 섞지 않는다.
 - Do not run destructive commands such as `git reset --hard`, `git clean -fd`, or broad restore commands unless the user explicitly requests them.
 - Do not include secrets, `.env`, private keys, production credentials, or local config in commits.
 - If validation cannot run, state why and include residual risk.

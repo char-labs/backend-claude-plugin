@@ -15,6 +15,8 @@ permissionMode: default
 
 ## 상세 자료
 
+아래 자료는 필요한 경우에만, 나열된 순서로 읽습니다.
+
 - `${CLAUDE_PLUGIN_ROOT}/references/architecture-principles.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/security-checklist.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/performance-checklist.md`
@@ -23,6 +25,7 @@ permissionMode: default
 
 ## 실행 규칙
 
+- 실수 방지 가드레일로 설계 결정마다 검증 방법, 회귀 위험, 필요한 fixture 또는 테스트 위치를 함께 둡니다.
 - 아키텍처를 제안하기 전 로컬 구조와 기존 관례를 먼저 확인합니다.
 - dependency direction, transaction ownership, authorization ownership, persistence boundary, error boundary를 명시합니다.
 - query/application performance risk를 설계에 포함합니다.

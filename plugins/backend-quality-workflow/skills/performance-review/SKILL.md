@@ -8,9 +8,11 @@ argument-hint: "[파일, diff, 엔드포인트, 쿼리, 리뷰 범위]"
 
 ## 설명
 
-`$ARGUMENTS`를 query bottleneck과 application bottleneck 관점으로 검토한다. 데이터 분포나 운영 index가 보이지 않아 확정할 수 없는 경우 residual risk로 표시한다.
+사용자 요청을 query bottleneck과 application bottleneck 관점으로 검토한다. 데이터 분포나 운영 index가 보이지 않아 확정할 수 없는 경우 residual risk로 표시한다.
 
 ## 상세 자료
+
+아래 자료는 필요한 경우에만, 나열된 순서로 읽는다.
 
 - `${CLAUDE_PLUGIN_ROOT}/references/performance-checklist.md`
 - `${CLAUDE_PLUGIN_ROOT}/templates/review-finding-template.md`
@@ -31,6 +33,7 @@ argument-hint: "[파일, diff, 엔드포인트, 쿼리, 리뷰 범위]"
 
 ## 주의사항
 
+- 실수 방지 가드레일: 성능 finding은 재현 조건, 측정 지표, 회귀 검증 방법을 함께 요구한다.
 - 미세 최적화보다 사용자 영향, 부하 상황, 확장성에 영향을 주는 병목을 우선한다.
 - 캐시는 stale data, stampede, invalidation, authorization leakage 위험을 함께 검토한다.
 

@@ -15,12 +15,15 @@ permissionMode: default
 
 ## 상세 자료
 
+아래 자료는 필요한 경우에만, 나열된 순서로 읽습니다.
+
 - `${CLAUDE_PLUGIN_ROOT}/references/performance-checklist.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/spring-kotlin-backend.md`
 - `${CLAUDE_PLUGIN_ROOT}/templates/review-finding-template.md`
 
 ## 실행 규칙
 
+- 실수 방지 가드레일로 성능 finding마다 재현 조건, 측정 지표, 회귀 검증 방법을 함께 요구합니다.
 - N+1 query pattern, mapper/serializer/logging lazy loading, per-row repository call을 확인합니다.
 - pagination/limit/index 누락, broad fetch, expensive count query를 확인합니다.
 - long transaction, lock contention, transaction 내부 remote call, per-item flush/write를 확인합니다.

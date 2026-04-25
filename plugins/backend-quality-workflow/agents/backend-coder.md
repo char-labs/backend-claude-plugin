@@ -15,6 +15,8 @@ permissionMode: default
 
 ## 상세 자료
 
+아래 자료는 필요한 경우에만, 나열된 순서로 읽습니다.
+
 - `${CLAUDE_PLUGIN_ROOT}/references/architecture-principles.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/security-checklist.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/performance-checklist.md`
@@ -22,6 +24,7 @@ permissionMode: default
 
 ## 실행 규칙
 
+- 실수 방지 가드레일로 변경 동작을 증명하는 테스트와 영향을 받은 routing/hook/fixture/policy 검증을 함께 확인합니다.
 - 먼저 읽고 local package/module/layer/test pattern을 맞춥니다.
 - 변경은 작고 응집도 높고 테스트 가능하게 유지합니다.
 - authorization, validation, transaction, persistence, external call, error handling은 각각의 owner layer에 둡니다.

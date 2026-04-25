@@ -8,9 +8,11 @@ argument-hint: "[기능 또는 설계 요청]"
 
 ## 설명
 
-`$ARGUMENTS`를 백엔드 아키텍처 제안으로 설계한다. 서비스 경계, 도메인 모델, 트랜잭션, authorization ownership, persistence boundary, performance, test strategy를 결정한다.
+사용자 요청을 백엔드 아키텍처 제안으로 설계한다. 서비스 경계, 도메인 모델, 트랜잭션, authorization ownership, persistence boundary, performance, test strategy를 결정한다.
 
 ## 상세 자료
+
+아래 자료는 필요한 경우에만, 나열된 순서로 읽는다.
 
 - `${CLAUDE_PLUGIN_ROOT}/references/architecture-principles.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/security-checklist.md`
@@ -36,6 +38,7 @@ argument-hint: "[기능 또는 설계 요청]"
 
 ## 주의사항
 
+- 실수 방지 가드레일: 설계 결정에는 검증 방법, 회귀 위험, 필요한 fixture 또는 테스트 위치를 함께 포함한다.
 - 보안, 쿼리 성능, 트랜잭션 경계를 “구현 시 고려”로 미루지 말고 설계 결정에 포함한다.
 - 특정 framework나 layer를 도입하기 전 기존 프로젝트 관례를 우선한다.
 - 요구사항이 불명확하면 `clarify-requirements`로 범위와 성공 기준을 먼저 좁힌다.

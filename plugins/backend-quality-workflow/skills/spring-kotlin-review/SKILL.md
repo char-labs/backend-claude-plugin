@@ -8,9 +8,11 @@ argument-hint: "[파일, diff, 엔드포인트, 모듈, 리뷰 범위]"
 
 ## 설명
 
-`$ARGUMENTS`를 Spring/Kotlin 특화 관점으로 검토한다. 일반 리뷰보다 Spring Security, JPA/Hibernate, transaction, Gradle/Kotlin convention을 우선한다.
+사용자 요청을 Spring/Kotlin 특화 관점으로 검토한다. 일반 리뷰보다 Spring Security, JPA/Hibernate, transaction, Gradle/Kotlin convention을 우선한다.
 
 ## 상세 자료
+
+아래 자료는 필요한 경우에만, 나열된 순서로 읽는다.
 
 - `${CLAUDE_PLUGIN_ROOT}/references/spring-kotlin-backend.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/security-checklist.md`
@@ -33,6 +35,7 @@ argument-hint: "[파일, diff, 엔드포인트, 모듈, 리뷰 범위]"
 
 ## 주의사항
 
+- 실수 방지 가드레일: Spring/Kotlin finding은 관련 Gradle 검증, slice/integration test, import/style check를 함께 연결한다.
 - Spring annotation만 보고 보안/트랜잭션이 충분하다고 가정하지 않는다.
 - Entity를 API response로 직접 노출하거나 lazy association을 serialization에 맡기지 않는다.
 - import style은 프로젝트 지시대로 top-of-file import를 우선한다.

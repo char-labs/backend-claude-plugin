@@ -7,13 +7,21 @@
 플러그인 구조와 manifest를 먼저 검증한다.
 
 ```bash
-claude plugin validate "/Users/yunbeom/Documents/New project/backend-claude-plugin/plugins/backend-quality-workflow"
+claude plugin validate ./plugins/backend-quality-workflow
+```
+
+실수 방지 가드레일 정책과 회귀 테스트를 실행한다.
+
+```bash
+./plugins/backend-quality-workflow/tests/run-guardrail-policy-tests.py
+./plugins/backend-quality-workflow/tests/eval/routing/run-routing-tests.py
+./plugins/backend-quality-workflow/tests/run-hook-tests.py
 ```
 
 현재 작업 중인 plugin directory를 세션에만 임시 로드한다.
 
 ```bash
-claude --plugin-dir "/Users/yunbeom/Documents/New project/backend-claude-plugin/plugins/backend-quality-workflow" --debug
+claude --plugin-dir ./plugins/backend-quality-workflow --debug
 ```
 
 Claude Code 안에서 다음을 확인한다.
@@ -40,7 +48,7 @@ Claude Code 안에서 다음을 확인한다.
 개발 중인 로컬 repository를 marketplace로 등록한다.
 
 ```bash
-claude plugin marketplace add "/Users/yunbeom/Documents/New project/backend-claude-plugin"
+claude plugin marketplace add .
 ```
 
 plugin을 설치한다.

@@ -15,12 +15,15 @@ permissionMode: default
 
 ## 상세 자료
 
+아래 자료는 필요한 경우에만, 나열된 순서로 읽습니다.
+
 - `${CLAUDE_PLUGIN_ROOT}/references/architecture-principles.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/spring-kotlin-backend.md`
 - `${CLAUDE_PLUGIN_ROOT}/templates/review-finding-template.md`
 
 ## 실행 규칙
 
+- 실수 방지 가드레일로 리팩터 제안의 테스트 가능성과 회귀 검증 방법을 함께 확인합니다.
 - 책임이 과도한 class를 확인합니다.
 - domain behavior가 controller, mapper, repository, utility에 흩어졌는지 확인합니다.
 - high-level policy가 concrete infrastructure에 직접 의존하는지 확인합니다.

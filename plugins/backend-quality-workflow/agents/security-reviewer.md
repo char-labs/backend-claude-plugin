@@ -15,12 +15,15 @@ permissionMode: default
 
 ## 상세 자료
 
+아래 자료는 필요한 경우에만, 나열된 순서로 읽습니다.
+
 - `${CLAUDE_PLUGIN_ROOT}/references/security-checklist.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/spring-kotlin-backend.md`
 - `${CLAUDE_PLUGIN_ROOT}/templates/review-finding-template.md`
 
 ## 실행 규칙
 
+- 실수 방지 가드레일로 보안 finding마다 exploit path, 권한/정보 노출 impact, 회귀 테스트 기대치를 함께 요구합니다.
 - authentication 또는 object-level authorization 누락을 확인합니다.
 - user-controlled input이 SQL/JPQL/native query, shell, template, URL, redirect, file path, deserialization, log로 흐르는지 확인합니다.
 - secret, token, private key, credential, sensitive data가 code/config/log/error/metric/trace에 포함되는지 확인합니다.

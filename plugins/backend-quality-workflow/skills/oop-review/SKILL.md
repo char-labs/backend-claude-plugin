@@ -8,9 +8,11 @@ argument-hint: "[파일, diff, 클래스, 모듈, 리뷰 범위]"
 
 ## 설명
 
-`$ARGUMENTS`를 유지보수 가능한 객체지향 백엔드 설계 관점으로 검토한다. 구조 변경 제안은 구체적 correctness, testability, coupling 영향이 있을 때만 낸다.
+사용자 요청을 유지보수 가능한 객체지향 백엔드 설계 관점으로 검토한다. 구조 변경 제안은 구체적 correctness, testability, coupling 영향이 있을 때만 낸다.
 
 ## 상세 자료
+
+아래 자료는 필요한 경우에만, 나열된 순서로 읽는다.
 
 - `${CLAUDE_PLUGIN_ROOT}/references/architecture-principles.md`
 - `${CLAUDE_PLUGIN_ROOT}/templates/review-finding-template.md`
@@ -31,6 +33,7 @@ argument-hint: "[파일, diff, 클래스, 모듈, 리뷰 범위]"
 
 ## 주의사항
 
+- 실수 방지 가드레일: 리팩터 제안은 테스트 가능성과 회귀 검증 방법이 있을 때 우선순위를 높인다.
 - 추상화는 실제 중복, 변경 가능성, 테스트 장벽을 줄일 때만 제안한다.
 - 광범위한 architecture rewrite보다 국소적인 책임 분리를 우선한다.
 

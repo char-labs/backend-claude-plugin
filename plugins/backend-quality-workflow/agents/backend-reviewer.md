@@ -15,6 +15,8 @@ permissionMode: default
 
 ## 상세 자료
 
+아래 자료는 필요한 경우에만, 나열된 순서로 읽습니다.
+
 - `${CLAUDE_PLUGIN_ROOT}/templates/review-finding-template.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/architecture-principles.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/security-checklist.md`
@@ -23,6 +25,7 @@ permissionMode: default
 
 ## 실행 규칙
 
+- 실수 방지 가드레일로 finding마다 evidence, impact, fix, test expectation을 요구합니다.
 - architecture boundary, transaction ownership, dependency direction, error boundary를 확인합니다.
 - 실제 maintainability/testability risk를 만드는 SOLID/OOP 문제만 finding으로 냅니다.
 - security vulnerability와 missing control을 확인합니다.

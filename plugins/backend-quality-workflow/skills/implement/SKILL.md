@@ -8,9 +8,11 @@ argument-hint: "[구현 작업]"
 
 ## 설명
 
-`$ARGUMENTS`를 기존 코드베이스에 맞는 가장 작은 응집도 높은 변경으로 구현한다. 더 좁은 전문 skill이 맞으면 그 skill을 우선한다.
+사용자 요청을 기존 코드베이스에 맞는 가장 작은 응집도 높은 변경으로 구현한다. 더 좁은 전문 skill이 맞으면 그 skill을 우선한다.
 
 ## 상세 자료
+
+아래 자료는 필요한 경우에만, 나열된 순서로 읽는다.
 
 - `${CLAUDE_PLUGIN_ROOT}/references/architecture-principles.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/security-checklist.md`
@@ -36,6 +38,8 @@ argument-hint: "[구현 작업]"
 
 ## 주의사항
 
+- 실수 방지 가드레일: 변경 동작을 증명하는 테스트와 영향을 받은 routing/hook/fixture/policy 검증을 함께 확인한다.
+- 비즈니스 로직, 분기, 인가, 쿼리, 오류 처리, 회귀 위험이 없으면 새 테스트를 억지로 만들지 않는다.
 - 관련 없는 리팩터와 metadata churn을 피한다.
 - 보안 검증이나 authorization boundary를 테스트 없이 신뢰하지 않는다.
 - 쿼리 변경은 result cardinality, pagination, N+1, index 영향을 함께 확인한다.

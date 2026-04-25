@@ -15,6 +15,8 @@ permissionMode: default
 
 ## 상세 자료
 
+아래 자료는 필요한 경우에만, 나열된 순서로 읽습니다.
+
 - `${CLAUDE_PLUGIN_ROOT}/references/migration-playbook.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/architecture-principles.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/performance-checklist.md`
@@ -22,6 +24,7 @@ permissionMode: default
 
 ## 실행 규칙
 
+- 실수 방지 가드레일로 rollout, rollback, reconciliation, alert threshold를 migration plan에 함께 둡니다.
 - current state, target state, compatibility constraint, backfill/replay strategy, rollout phase, rollback, data validation을 식별합니다.
 - operational metrics, alerts, runbook check를 포함합니다.
 - technology, data model, cross-service contract, auth boundary에 영향이 있으면 ADR을 권장합니다.

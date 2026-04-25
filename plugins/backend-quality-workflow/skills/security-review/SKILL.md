@@ -8,9 +8,11 @@ argument-hint: "[파일, diff, 엔드포인트, 리뷰 범위]"
 
 ## 설명
 
-`$ARGUMENTS`를 exploit 가능한 보안 위험 관점으로 검토한다. obvious issue가 보이지 않는 것은 제한적 assurance일 뿐 안전 증명이 아니다.
+사용자 요청을 exploit 가능한 보안 위험 관점으로 검토한다. obvious issue가 보이지 않는 것은 제한적 assurance일 뿐 안전 증명이 아니다.
 
 ## 상세 자료
+
+아래 자료는 필요한 경우에만, 나열된 순서로 읽는다.
 
 - `${CLAUDE_PLUGIN_ROOT}/references/security-checklist.md`
 - `${CLAUDE_PLUGIN_ROOT}/templates/review-finding-template.md`
@@ -32,6 +34,7 @@ argument-hint: "[파일, diff, 엔드포인트, 리뷰 범위]"
 
 ## 주의사항
 
+- 실수 방지 가드레일: 보안 finding은 exploit path, 권한/정보 노출 impact, 회귀 테스트 기대치를 함께 요구한다.
 - “취약점 없음”이라고 단정하지 않는다.
 - PII, token, secret은 예시에도 실제 값을 포함하지 않는다.
 - 보안 finding은 exploit path 또는 privilege/정보 노출 impact가 분명해야 한다.

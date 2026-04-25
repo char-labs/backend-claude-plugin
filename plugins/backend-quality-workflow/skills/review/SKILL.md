@@ -8,9 +8,11 @@ argument-hint: "[파일, diff, PR, 리뷰 범위]"
 
 ## 설명
 
-`$ARGUMENTS`를 backend quality 관점으로 종합 리뷰한다. 넓은 조언보다 concrete evidence가 있는 finding을 우선한다.
+사용자 요청을 backend quality 관점으로 종합 리뷰한다. 넓은 조언보다 concrete evidence가 있는 finding을 우선한다.
 
 ## 상세 자료
+
+아래 자료는 필요한 경우에만, 나열된 순서로 읽는다.
 
 - `${CLAUDE_PLUGIN_ROOT}/templates/review-finding-template.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/architecture-principles.md`
@@ -37,6 +39,7 @@ argument-hint: "[파일, diff, PR, 리뷰 범위]"
 
 ## 주의사항
 
+- 실수 방지 가드레일: finding마다 재현 증거, concrete fix, test expectation이 없으면 심각도를 낮추거나 residual risk로 둔다.
 - 심각도가 낮은 style preference로 high severity finding을 만들지 않는다.
 - 보안은 “완전 보장”이 아니라 발견 가능한 위험을 낮추는 방식으로 표현한다.
 - focused scope가 명확하면 `security-review`, `performance-review`, `persistence-query-review`, `oop-review`, `spring-kotlin-review`를 우선 고려한다.

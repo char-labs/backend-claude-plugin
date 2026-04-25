@@ -40,6 +40,12 @@ Use this reference when the target backend uses Kotlin, Spring Boot, Spring Secu
 - Do not add plugins or dependencies automatically. Recommend additions with rationale.
 - If a module path exists, scope validation to the affected module first, then broaden if shared contracts changed.
 
+## Spring/Kotlin Test Guardrails
+
+- 테스트 코드는 실 DB, 공유 개발 DB, 운영 DB에 직접 연결하지 않는다.
+- 테스트 코드에는 `@Transactional`을 붙여 rollback에 의존하지 않는다. 데이터 격리는 명시적 setup/cleanup, fake/mock, 또는 repo convention의 disposable test DB로 처리한다.
+- Presentation/Controller 테스트는 선택 항목이다. 작성 전 사용자에게 확인하고, 기본은 Service/UseCase/Domain 테스트를 우선한다.
+
 ## Common Spring/Kotlin Findings
 
 - N+1 from repository calls inside `map`, `forEach`, resolver methods, or lazy collection access.

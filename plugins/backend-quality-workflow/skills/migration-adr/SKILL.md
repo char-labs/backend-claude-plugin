@@ -8,9 +8,11 @@ argument-hint: "[마이그레이션 또는 ADR 작업]"
 
 ## 설명
 
-`$ARGUMENTS`가 단계적 rollout, 데이터 안전성, 하위 호환성, 아키텍처 의사결정 기록을 필요로 할 때 사용한다.
+사용자 요청이 단계적 rollout, 데이터 안전성, 하위 호환성, 아키텍처 의사결정 기록을 필요로 할 때 사용한다.
 
 ## 상세 자료
+
+아래 자료는 필요한 경우에만, 나열된 순서로 읽는다.
 
 - `${CLAUDE_PLUGIN_ROOT}/references/migration-playbook.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/architecture-principles.md`
@@ -33,6 +35,7 @@ argument-hint: "[마이그레이션 또는 ADR 작업]"
 
 ## 주의사항
 
+- 실수 방지 가드레일: rollout, rollback, reconciliation, alert threshold를 migration plan에 함께 둔다.
 - 데이터 삭제/스키마 축소는 contract consumer와 backfill 완료가 확인된 뒤에만 계획한다.
 - dual-write나 replay에는 idempotency와 재처리 전략을 포함한다.
 - 민감 데이터 이관에는 암호화, 접근권한, audit log를 포함한다.

@@ -8,9 +8,11 @@ argument-hint: "[API 계약 설계 작업]"
 
 ## 설명
 
-`$ARGUMENTS`의 API 입출력, wire schema, 하위 호환성을 설계한다. GraphQL, gRPC/protobuf, REST/OpenAPI, DTO 경계, 오류 응답, pagination, authorization이 포함된 작업에 사용한다.
+사용자 요청의 API 입출력, wire schema, 하위 호환성을 설계한다. GraphQL, gRPC/protobuf, REST/OpenAPI, DTO 경계, 오류 응답, pagination, authorization이 포함된 작업에 사용한다.
 
 ## 상세 자료
+
+아래 자료는 필요한 경우에만, 나열된 순서로 읽는다.
 
 - `${CLAUDE_PLUGIN_ROOT}/references/api-protocols.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/security-checklist.md`
@@ -32,6 +34,7 @@ argument-hint: "[API 계약 설계 작업]"
 
 ## 주의사항
 
+- 실수 방지 가드레일: 계약 변경 시 호환성 fixture, authorization test, schema/proto generation 검증을 함께 갱신한다.
 - 내부 persistence field, framework exception, stack trace, 민감정보가 API로 새지 않게 한다.
 - protected API는 인증과 object-level authorization을 명시한다.
 

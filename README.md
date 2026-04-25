@@ -38,6 +38,7 @@ claude plugin install backend-quality-workflow@backend-claude-plugin --scope use
 | Spring/Kotlin | Spring Security, JPA/Hibernate, `@Transactional`, Gradle, Kotlin nullability/import style |
 | 라우팅 | 사용자 요청을 분석해 적절한 skill/agent 후보를 제안하는 `UserPromptSubmit` hook |
 | 보안 가드 | 위험한 shell, 민감 파일 read/write, `.env`, private key, credentials 접근 차단 |
+| 실수 방지 가드레일 | routing eval, hook regression, policy test, fixture, CI gate를 각 workflow에 통합 |
 
 ## 주요 Skills
 
@@ -100,6 +101,14 @@ Spring Security 설정에서 permitAll 범위가 안전한지 확인해줘.
 claude plugin validate ./plugins/backend-quality-workflow
 ```
 
+실수 방지 가드레일 회귀 테스트를 실행합니다.
+
+```bash
+./plugins/backend-quality-workflow/tests/run-guardrail-policy-tests.py
+./plugins/backend-quality-workflow/tests/eval/routing/run-routing-tests.py
+./plugins/backend-quality-workflow/tests/run-hook-tests.py
+```
+
 개발 중인 plugin directory를 현재 세션에만 로드합니다.
 
 ```bash
@@ -143,6 +152,16 @@ backend-claude-plugin/
 - `.env`, private key, credentials, production config 같은 민감 파일 read/write를 차단합니다.
 - 외부 scanner나 dependency는 자동 설치하지 않습니다.
 - security review 결과는 evidence, impact, fix, test expectation 중심으로 작성합니다.
+
+## Context Cache Hygiene
+
+이 repository의 Markdown 문서는 Claude prompt caching이 정적 prefix를 재사용하기 쉽도록 작성합니다.
+
+- skill/agent 문서 앞쪽에는 사용자 요청 원문, 날짜, timestamp, 개인 로컬 절대경로를 넣지 않습니다.
+- 요청 대상을 가리킬 때는 `사용자 요청`, `대상 코드`처럼 정적인 표현을 사용합니다.
+- 상세 reference는 필요한 경우에만, 문서에 적힌 순서대로 읽도록 안내합니다.
+- 긴 예시와 프로젝트별 세부 규칙은 `references/`와 `templates/`로 분리합니다.
+- 배포 변경 시 `plugin.json`의 `version`을 올려 캐시와 설치 업데이트 경계를 명확히 합니다.
 
 ## Requirements
 

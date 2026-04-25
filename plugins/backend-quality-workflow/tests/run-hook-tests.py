@@ -49,6 +49,13 @@ def assert_advisory(name: str, payload: dict, mode: str = "post-tool") -> None:
     assert "systemMessage" in data, name
 
 
+def assert_advisory_contains(name: str, payload: dict, expected: str, mode: str = "post-tool") -> None:
+    code, out = run(ADVISORY, payload, mode)
+    assert code == 0, name
+    data = json.loads(out)
+    assert expected in data.get("systemMessage", ""), name
+
+
 def assert_route(name: str, prompt: str, expected_agent: str, expected_skill: str) -> None:
     code, out = run(ROUTER, {"prompt": prompt, "cwd": str(ROOT)})
     assert code == 0, name
@@ -90,6 +97,16 @@ def main() -> None:
     assert_advisory(
         "emits backend edit advisory",
         {"tool_name": "Write", "tool_input": {"file_path": "src/main/kotlin/App.kt"}},
+    )
+    assert_advisory_contains(
+        "emits test minimalism advisory",
+        {"tool_name": "Write", "tool_input": {"file_path": "src/test/kotlin/AppTest.kt"}},
+        "비즈니스 로직",
+    )
+    assert_advisory_contains(
+        "emits controller test confirmation advisory",
+        {"tool_name": "Write", "tool_input": {"file_path": "src/test/kotlin/UserControllerTest.kt"}},
+        "Controller/Presentation",
     )
     assert_advisory("emits stop advisory", {"hook_event_name": "Stop"}, "stop")
     assert_route(

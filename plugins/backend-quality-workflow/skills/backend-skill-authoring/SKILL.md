@@ -8,9 +8,11 @@ argument-hint: "[스킬로 만들 백엔드 컨벤션 또는 기존 SKILL.md]"
 
 ## 설명
 
-`$ARGUMENTS`를 백엔드 도메인 스킬로 정리하거나 기존 스킬을 개선할 때 사용한다.
+사용자 요청을 백엔드 도메인 스킬로 정리하거나 기존 스킬을 개선할 때 사용한다.
 
 ## 상세 자료
+
+아래 자료는 필요한 경우에만, 나열된 순서로 읽는다.
 
 - `${CLAUDE_PLUGIN_ROOT}/references/backend-skill-authoring-patterns.md`
 - `${CLAUDE_PLUGIN_ROOT}/templates/backend-domain-skill-template.md`
@@ -32,6 +34,7 @@ argument-hint: "[스킬로 만들 백엔드 컨벤션 또는 기존 SKILL.md]"
 
 ## 주의사항
 
+- 실수 방지 가드레일: 새 스킬이나 에이전트를 추가하면 routing fixture, frontmatter 검증, 문서 정책 테스트를 함께 갱신한다.
 - 특정 회사/서비스 경로, catalog, 정책은 범용 plugin에 직접 고정하지 않는다.
 - 보안/인가, 쿼리 병목, 트랜잭션 경계, 검증 명령이 빠진 개발 스킬은 불완전한 것으로 본다.
 - 서브에이전트가 사용할 skill이면 `<!-- skill: skill-name -->` 힌트와 함께 직접 활성화할 수 있게 설명한다.
