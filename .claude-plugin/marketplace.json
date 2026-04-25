@@ -1,0 +1,23 @@
+{
+  "name": "backend-claude-plugin",
+  "owner": {
+    "name": "char-yb"
+  },
+  "metadata": {
+    "description": "char-labs 백엔드 품질, 보안, 성능, OOP/SOLID, Spring/Kotlin workflow plugin marketplace.",
+    "version": "1.0.0",
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "backend-quality-workflow",
+      "source": "./plugins/backend-quality-workflow",
+      "description": "백엔드 아키텍처, OOP/SOLID, 성능, 보안 리뷰 workflow와 Spring/Kotlin 가이드를 제공하는 Claude Code plugin.",
+      "version": "1.0.0",
+      "author": {
+        "name": "char-yb"
+      },
+      "homepage": "https://github.com/char-labs/backend-claude-plugin"
+    }
+  ]
+}

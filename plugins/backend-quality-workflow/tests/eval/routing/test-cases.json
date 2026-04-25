@@ -1,0 +1,156 @@
+[
+  {
+    "id": "D01",
+    "type": "direct",
+    "prompt": "Review this backend PR for security, performance, architecture, and tests",
+    "expected_agent": "backend-reviewer",
+    "expected_skill": "review"
+  },
+  {
+    "id": "D02",
+    "type": "direct",
+    "prompt": "UserRepository findByNickname query is slow and may have N+1",
+    "expected_agent": "persistence-query-specialist",
+    "expected_skill": "persistence-query-review"
+  },
+  {
+    "id": "D03",
+    "type": "direct",
+    "prompt": "Define GraphQL input and response for profile update",
+    "expected_agent": "api-contract-designer",
+    "expected_skill": "api-contract-design"
+  },
+  {
+    "id": "D04",
+    "type": "direct",
+    "prompt": "CallService has a bug and needs regression tests",
+    "expected_agent": "backend-test-writer",
+    "expected_skill": "backend-test-strategy"
+  },
+  {
+    "id": "D05",
+    "type": "direct",
+    "prompt": "Plan the migration from MySQL chat storage to DynamoDB with rollback",
+    "expected_agent": "migration-planner",
+    "expected_skill": "migration-adr"
+  },
+  {
+    "id": "D06",
+    "type": "direct",
+    "prompt": "Gradle compileKotlin is failing after protobuf changes",
+    "expected_agent": "build-validation-specialist",
+    "expected_skill": "build-validation"
+  },
+  {
+    "id": "N01",
+    "type": "natural",
+    "prompt": "API response shape for the mobile client needs to be decided before implementation",
+    "expected_agent": "api-contract-designer",
+    "expected_skill": "api-contract-design"
+  },
+  {
+    "id": "N02",
+    "type": "natural",
+    "prompt": "The endpoint takes 3 seconds and Redis cache may help",
+    "expected_agent": "performance-reviewer",
+    "expected_skill": "performance-review"
+  },
+  {
+    "id": "N03",
+    "type": "natural",
+    "prompt": "We need to make sure users cannot read another account's data",
+    "expected_agent": "security-reviewer",
+    "expected_skill": "security-review"
+  },
+  {
+    "id": "A01",
+    "type": "ambiguous",
+    "prompt": "Design the backend flow for this new matching feature",
+    "expected_agent": "backend-architect",
+    "expected_skill": "design"
+  },
+  {
+    "id": "A02",
+    "type": "ambiguous",
+    "prompt": "Add the backend feature",
+    "expected_agent": "backend-architect",
+    "expected_skill": "clarify-requirements"
+  },
+  {
+    "id": "K01",
+    "type": "korean",
+    "prompt": "UserRepository의 findByNickname 조회 쿼리가 너무 느리고 N+1이 의심돼",
+    "expected_agent": "persistence-query-specialist",
+    "expected_skill": "persistence-query-review"
+  },
+  {
+    "id": "K02",
+    "type": "korean",
+    "prompt": "프로필 수정 GraphQL API 입출력 스키마를 설계해줘",
+    "expected_agent": "api-contract-designer",
+    "expected_skill": "api-contract-design"
+  },
+  {
+    "id": "K03",
+    "type": "korean",
+    "prompt": "다른 사용자의 계정 정보를 읽을 수 없도록 인가 취약점 검토해줘",
+    "expected_agent": "security-reviewer",
+    "expected_skill": "security-review"
+  },
+  {
+    "id": "K04",
+    "type": "korean",
+    "prompt": "팔로우 기능 단위 테스트와 회귀 테스트를 작성해줘",
+    "expected_agent": "backend-test-writer",
+    "expected_skill": "backend-test-strategy"
+  },
+  {
+    "id": "K05",
+    "type": "korean",
+    "prompt": "채팅 저장소를 MySQL에서 DynamoDB로 무중단 전환하는 마이그레이션 계획 세워줘",
+    "expected_agent": "migration-planner",
+    "expected_skill": "migration-adr"
+  },
+  {
+    "id": "K06",
+    "type": "korean",
+    "prompt": "protobuf 변경 후 Gradle compileKotlin 빌드가 깨졌어",
+    "expected_agent": "build-validation-specialist",
+    "expected_skill": "build-validation"
+  },
+  {
+    "id": "K07",
+    "type": "korean",
+    "prompt": "응답 시간이 3초 걸리고 Redis 캐시 적용 여부를 봐줘",
+    "expected_agent": "performance-reviewer",
+    "expected_skill": "performance-review"
+  },
+  {
+    "id": "K08",
+    "type": "korean",
+    "prompt": "새 백엔드 기능 추가해줘",
+    "expected_agent": "backend-architect",
+    "expected_skill": "clarify-requirements"
+  },
+  {
+    "id": "K09",
+    "type": "korean",
+    "prompt": "Entity Skill 같은 뉘앙스로 백엔드 개발 워크플로우 스킬 패턴을 정리해줘",
+    "expected_agent": "backend-architect",
+    "expected_skill": "backend-skill-authoring"
+  },
+  {
+    "id": "X01",
+    "type": "negative",
+    "prompt": "git log recent 5 commits",
+    "expected_agent": null,
+    "expected_skill": null
+  },
+  {
+    "id": "X02",
+    "type": "negative",
+    "prompt": "Read README.md and summarize it",
+    "expected_agent": null,
+    "expected_skill": null
+  }
+]
