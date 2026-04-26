@@ -1,0 +1,10 @@
+{
+  "name": "git-utils",
+  "description": "브랜치, 커밋, 푸시, PR workflow를 안전하게 지원하는 Git 유틸리티 plugin.",
+  "version": "0.1.0",
+  "author": {
+    "name": "char-yb"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/char-labs/backend-claude-plugin"
+}

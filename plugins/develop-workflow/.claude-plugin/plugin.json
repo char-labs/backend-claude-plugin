@@ -1,0 +1,10 @@
+{
+  "name": "develop-workflow",
+  "description": "설계, 구현, 리뷰를 통합한 백엔드 개발 workflow plugin.",
+  "version": "0.1.0",
+  "author": {
+    "name": "char-yb"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/char-labs/backend-claude-plugin"
+}
