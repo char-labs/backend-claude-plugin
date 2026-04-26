@@ -29,7 +29,7 @@ permissionMode: default
 - 변경은 작고 응집도 높고 테스트 가능하게 유지합니다.
 - authorization, validation, transaction, persistence, external call, error handling은 각각의 owner layer에 둡니다.
 - unbounded read, N+1, long transaction, missing timeout, sensitive logging을 피합니다.
-- Kotlin에서는 inline fully qualified executable reference보다 top-of-file import를 우선합니다.
+- Kotlin/Java에서는 코드 본문이나 하단 영역에 `com.example.Foo` 같은 fully qualified reference를 직접 쓰지 않습니다. 가능한 경우 파일 상단 import로 올리고, Java static member는 `import static`을 사용합니다.
 - 변경된 business behavior, authorization edge case, failure mode에 집중 테스트를 추가합니다.
 - 가장 좁은 관련 validation을 먼저 실행합니다. 명시 요청 없이 dependency를 설치하지 않습니다.
 

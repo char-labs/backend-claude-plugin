@@ -2,10 +2,16 @@
 
 Use this reference when the target backend uses Kotlin, Spring Boot, Spring Security, JPA/Hibernate, Gradle, or related JVM infrastructure.
 
+## Kotlin/Java Import Style
+
+- 코드 본문, 함수 내부, 테스트 본문, 타입 선언 하단 영역에 `com.example.Foo`처럼 fully qualified name을 직접 쓰지 않는다.
+- 클래스, enum, object, companion object member, top-level function, 테스트 헬퍼는 언어가 허용하는 한 파일 상단 import로 올린다.
+- Java static member, assertion helper, Mockito/AssertJ/JUnit static helper는 본문에서 `org.example.Type.member`로 쓰지 말고 `import static`을 사용한다.
+- Kotlin에서는 Java의 `import static` 대신 일반 import로 object/companion/top-level member를 직접 import할 수 있으면 그렇게 한다.
+- Fully qualified name은 언어/프레임워크가 요구하는 경우에만 남긴다. 예: package/import 선언, JPQL/HQL constructor expression 문자열, string 기반 framework 설정, reflection/generator가 canonical class name 문자열을 요구하는 경우.
+
 ## Kotlin Style
 
-- Prefer top-of-file imports over inline fully qualified class, enum, or object references in executable code.
-- Keep fully qualified names only where the language or framework requires them, such as JPQL constructor expressions or string-based class names.
 - Use Kotlin nullability as a contract. Avoid `!!` unless the invariant is proven locally and a better type cannot express it.
 - Prefer immutable data for request commands and value objects.
 - Keep extension functions discoverable and domain-relevant. Avoid hiding important dependencies in extensions.
@@ -53,4 +59,4 @@ Use this reference when the target backend uses Kotlin, Spring Boot, Spring Secu
 - `@Transactional` missing around multi-step write use cases.
 - Catch-all exception handlers returning internal messages.
 - Logging request bodies, tokens, authorization headers, or entity snapshots with PII.
-- Inline fully qualified names in executable Kotlin code where an import should be used.
+- 본문/하단 영역의 inline fully qualified name. Java static member는 `import static`, Kotlin member/top-level reference는 파일 상단 import를 써야 한다.

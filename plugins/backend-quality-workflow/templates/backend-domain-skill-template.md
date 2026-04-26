@@ -49,7 +49,7 @@ argument-hint: "[{작업 대상}]"
 
 - 요청 원문, `$ARGUMENTS`, 날짜, 개인 로컬 절대경로처럼 호출마다 달라지는 값은 `SKILL.md` 앞쪽에 넣지 않는다.
 - 실수 방지 가드레일: 변경이 routing, hook, fixture, 문서 정책에 영향을 주면 관련 회귀 테스트와 정책 테스트를 함께 갱신한다.
-- Kotlin 코드는 top-of-file import를 우선한다.
+- Kotlin/Java 코드는 본문/하단 영역에 `com.example.Foo` 같은 fully qualified reference를 직접 쓰지 않고 파일 상단 import를 우선한다. Java static member는 `import static`을 사용한다.
 - 민감정보 로그, 권한 누락, unbounded query, N+1을 기본 위험으로 본다.
 - 상세 예시는 reference에 둔다.
 ```

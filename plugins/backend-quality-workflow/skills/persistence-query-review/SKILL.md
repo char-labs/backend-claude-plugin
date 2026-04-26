@@ -39,6 +39,7 @@ argument-hint: "[쿼리, Repository, 영속성 작업]"
 - 동적 SQL/정렬은 문자열 결합보다 parameter binding과 allowlist를 우선한다.
 - fetch join은 pagination, duplicate row, cartesian product 위험을 함께 본다.
 - Repository가 authorization 누락을 숨기면 보안 finding으로 본다.
+- 쿼리 DTO, projection, enum, static helper는 코드 본문/하단 영역에 fully qualified name으로 쓰지 않는다. 파일 상단 import를 우선하고, Java static member는 `import static`을 사용한다.
 
 ## 출력
 

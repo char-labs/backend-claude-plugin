@@ -27,7 +27,7 @@ argument-hint: "[구현 작업]"
 3. authentication, authorization, input validation, sensitive logging, secret handling, error response를 명시적으로 처리한다.
 4. query shape, pagination/limit, index, timeout, retry, transaction scope, cache correctness를 확인한다.
 5. OOP/SOLID를 지킨다: 작은 cohesive class, 명시적 collaborator, 외부 시스템 abstraction, testable behavior.
-6. Kotlin에서는 executable code의 inline fully qualified reference보다 top-of-file import를 우선한다.
+6. Kotlin/Java에서는 코드 본문이나 하단 영역에 `com.example.Foo` 같은 fully qualified reference를 직접 쓰지 않는다. 클래스/enum/object/top-level function은 파일 상단 import로 올리고, Java static member는 `import static`을 사용한다.
 7. changed behavior와 주요 failure/security edge case에 집중 테스트를 추가/수정한다.
 8. 가장 좁은 validation을 먼저 실행하고, shared contract나 infrastructure가 바뀐 경우에만 확장한다.
 

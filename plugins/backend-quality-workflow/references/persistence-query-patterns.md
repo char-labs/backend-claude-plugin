@@ -33,4 +33,4 @@ Use this reference for Repository, SQL, JPQL, QueryDSL, JPA/Hibernate, and query
 
 - Use `@Transactional(readOnly = true)` for read use cases where local convention supports it.
 - Avoid relying on open-in-view to mask transaction boundary problems.
-- Keep Kotlin imports at the top of the file instead of inline fully qualified executable references.
+- Kotlin/Java 코드에서는 쿼리 DTO, projection, enum, static helper를 본문에서 fully qualified name으로 쓰지 말고 파일 상단 import로 올린다. Java static member는 `import static`을 사용한다.

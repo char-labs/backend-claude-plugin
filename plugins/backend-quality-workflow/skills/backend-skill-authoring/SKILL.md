@@ -23,7 +23,7 @@ argument-hint: "[스킬로 만들 백엔드 컨벤션 또는 기존 SKILL.md]"
 2. `SKILL.md`에는 트리거 설명, 핵심 실행 절차, 검증, 주의사항만 둔다.
 3. 긴 코드 예시, 상세 워크플로우, 프로젝트별 경로/카탈로그/예외 규칙은 `references/`로 분리한다.
 4. description은 제목형보다 “언제 사용해야 하는지”가 드러나게 쓴다.
-5. Kotlin/Spring 스킬이라면 top-of-file import, 트랜잭션 경계, 보안/인가, 쿼리 병목, 테스트 명령을 포함한다.
+5. Kotlin/Spring/Java 스킬이라면 코드 본문/하단 영역의 inline FQCN 금지, 파일 상단 import, Java `import static`, 트랜잭션 경계, 보안/인가, 쿼리 병목, 테스트 명령을 포함한다.
 6. Maum 같은 특정 프로젝트 규칙은 그대로 복사하지 말고 placeholder 또는 context pack 템플릿으로 일반화한다.
 
 ## 검증

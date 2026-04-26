@@ -28,7 +28,7 @@ argument-hint: "[기능 또는 설계 요청]"
 3. validation, authorization, transaction control, persistence, external call, error handling의 소유 계층을 정한다.
 4. unbounded read, N+1, missing index, long transaction 같은 query/application performance risk를 포함한다.
 5. authn/authz, input validation, secret, logging, SSRF/file handling, rate limit 보안 통제를 포함한다.
-6. Spring/Kotlin이면 `@Transactional`, Spring Security, DTO/domain/entity 분리, JPA fetch strategy, Gradle validation, Kotlin import style을 명시한다.
+6. Spring/Kotlin/Java이면 `@Transactional`, Spring Security, DTO/domain/entity 분리, JPA fetch strategy, Gradle validation, 파일 상단 import, Java `import static` 규칙을 명시한다.
 7. 기존 도구에 맞는 test와 validation command로 마무리한다.
 
 ## 검증

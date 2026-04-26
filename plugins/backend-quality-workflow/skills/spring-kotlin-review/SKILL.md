@@ -24,7 +24,7 @@ argument-hint: "[파일, diff, 엔드포인트, 모듈, 리뷰 범위]"
 1. Spring Security를 확인한다: route protection, method security, ownership check, CSRF/CORS behavior, overly broad `permitAll`.
 2. JPA/Hibernate를 확인한다: N+1, mapper/serializer/logging lazy loading, fetch join/entity graph/projection, bulk update, `open-in-view` reliance.
 3. transaction을 확인한다: use-case ownership, `readOnly`, write boundary, transaction 내부 remote call, event consistency.
-4. Kotlin을 확인한다: nullability contract, 불필요한 `!!`, immutable command/value object, executable code에서 inline fully qualified reference 대신 top-of-file import 사용.
+4. Kotlin/Java import를 확인한다: nullability contract, 불필요한 `!!`, immutable command/value object, 코드 본문/하단 영역의 inline fully qualified reference 금지, Java static member의 `import static` 사용.
 5. Gradle validation을 확인한다: existing `./gradlew` task, scoped module test, ktlint/detekt 존재 여부, 자동 dependency 설치 금지.
 
 ## 검증
@@ -38,7 +38,7 @@ argument-hint: "[파일, diff, 엔드포인트, 모듈, 리뷰 범위]"
 - 실수 방지 가드레일: Spring/Kotlin finding은 관련 Gradle 검증, slice/integration test, import/style check를 함께 연결한다.
 - Spring annotation만 보고 보안/트랜잭션이 충분하다고 가정하지 않는다.
 - Entity를 API response로 직접 노출하거나 lazy association을 serialization에 맡기지 않는다.
-- import style은 프로젝트 지시대로 top-of-file import를 우선한다.
+- import style은 엄격히 적용한다. 코드 본문/하단 영역에 `com.example.Foo`처럼 직접 쓰지 말고 파일 상단 import로 올리며, Java static member는 `import static`을 사용한다.
 
 ## 출력
 

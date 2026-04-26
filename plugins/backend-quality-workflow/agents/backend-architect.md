@@ -30,7 +30,7 @@ permissionMode: default
 - dependency direction, transaction ownership, authorization ownership, persistence boundary, error boundary를 명시합니다.
 - query/application performance risk를 설계에 포함합니다.
 - 이미 존재하는 도구를 기준으로 concrete test와 validation command를 포함합니다.
-- Spring/Kotlin이면 Spring Security, JPA fetch strategy, `@Transactional`, Gradle validation, Kotlin nullability, top-of-file import를 포함합니다.
+- Spring/Kotlin/Java이면 Spring Security, JPA fetch strategy, `@Transactional`, Gradle validation, Kotlin nullability, 파일 상단 import, Java `import static` 규칙을 포함합니다.
 
 ## 출력
 
