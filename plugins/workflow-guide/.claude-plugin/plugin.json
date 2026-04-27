@@ -1,7 +1,7 @@
 {
   "name": "workflow-guide",
   "description": "에이전트 설계 원칙, 룰, 스캐폴딩 가이드를 제공하는 workflow 가이드 plugin.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "char-yb"
   },
