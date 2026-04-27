@@ -12,12 +12,14 @@ permissionMode: default
 ## 스킬 활성화
 
 - 프롬프트에 `<!-- skill: design -->`, `<!-- skill: clarify-requirements -->`, `<!-- skill: backend-skill-authoring -->`가 있으면 Skill 도구가 사용 가능할 때 해당 skill을 먼저 활성화합니다.
+- 프롬프트에 `<!-- skill: spring-coroutine-concurrency -->`가 있으면 Skill 도구가 사용 가능할 때 먼저 `spring-coroutine-concurrency`를 활성화합니다.
 
 ## 상세 자료
 
 아래 자료는 필요한 경우에만, 나열된 순서로 읽습니다.
 
 - `${CLAUDE_PLUGIN_ROOT}/references/architecture-principles.md`
+- `${CLAUDE_PLUGIN_ROOT}/references/oop-design-patterns.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/security-checklist.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/performance-checklist.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/spring-kotlin-backend.md`
@@ -30,7 +32,18 @@ permissionMode: default
 - dependency direction, transaction ownership, authorization ownership, persistence boundary, error boundary를 명시합니다.
 - query/application performance risk를 설계에 포함합니다.
 - 이미 존재하는 도구를 기준으로 concrete test와 validation command를 포함합니다.
+- 비즈니스 행동은 private method가 아니라 역할 컴포넌트로 드러냅니다. 생성/삭제/발급/취소 같은 흐름은 `UserCreator`, `PostDeleter`, `CouponIssuer`, `OrderCanceller`처럼 이름 붙일 수 있어야 합니다.
+- 복잡한 비즈니스 orchestration은 Facade로, 단일 도메인 책임은 Service로 설계합니다. Facade는 Service만 의존하게 하고 repository/client/mapper/port를 직접 받지 않게 합니다.
+- 여러 class에서 반복될 변환/포맷팅/collection/null-safety 패턴은 `common`, `support`, `util` 또는 도메인 support 패키지의 확장 함수로 설계합니다.
+- Kotlin이면 scope function, `when`, `is` smart cast, null-safety, collection operation을 활용해 분기와 변환을 읽기 쉽게 설계합니다.
+- 생성 의도, mapping, invariant가 있는 객체는 companion object 정적 팩토리(`from`, `of`, `create`)를 우선 설계합니다.
+- Entity/input model/command-like data class에서 domain model로 가는 순수 변환은 `toDomain()`으로 설계합니다. repository/client 호출, 인가, 트랜잭션, lazy association traversal이 필요하면 Service나 domain factory 책임으로 둡니다.
+- Service/use-case 출력은 명시적 `*Result`로 두고, 입력 목적은 `*Command`, `*Query`, `*Criteria`로 분리합니다.
+- 변경 축, 워크플로우 골격, 생명주기 상태, provider 경계가 있으면 Strategy, Template Method, State, Specification/Policy, Adapter/Port, Decorator, Chain/Pipeline, Factory 중 가장 단순한 패턴을 선택합니다.
+- 디자인 패턴은 책임과 테스트 가능성을 높일 때만 사용하고, 단일 구현 interface나 불필요한 abstract class는 피합니다.
+- coroutine을 설계할 때는 도입 이유, blocking 요소, dispatcher 선택, structured concurrency, bounded fan-out, thread/memory tradeoff를 명시합니다.
 - Spring/Kotlin/Java이면 Spring Security, JPA fetch strategy, `@Transactional`, Gradle validation, Kotlin nullability, 파일 상단 import, Java `import static` 규칙을 포함합니다.
+- Kotlin DTO/data class 파일 구성은 같은 컨텍스트의 nested command/info/result 또는 응답 wrapper + DTO만 허용하고, 독립 개념은 분리하도록 설계합니다.
 
 ## 출력
 

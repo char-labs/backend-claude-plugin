@@ -26,6 +26,7 @@ permissionMode: default
 
 - 실수 방지 가드레일로 쿼리 변경의 result correctness, ownership boundary, pagination/limit 회귀 테스트를 함께 봅니다.
 - bounded read, pagination, explicit projection, 적절한 fetch join/entity graph, parameter binding을 우선합니다.
+- 검색/필터 조건은 immutable `*Criteria`, 읽기 의도는 `*Query`, Service read 결과는 `*Result`로 표현하고 필요한 mapping은 `from`/`of` 정적 팩토리를 우선합니다.
 - data access 근처에서 authorization filter와 tenant/account scoping을 확인합니다.
 - mapper, serializer, logging, loop 안에 lazy load를 숨기지 않습니다.
 - Kotlin/Java에서는 쿼리 DTO, projection, enum, static helper를 본문에서 fully qualified name으로 쓰지 않습니다. 가능한 경우 파일 상단 import로 올리고, Java static member는 `import static`을 사용합니다.

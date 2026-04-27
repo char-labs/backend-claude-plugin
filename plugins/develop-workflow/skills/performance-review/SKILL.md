@@ -4,7 +4,7 @@ description: 쿼리 병목, N+1, pagination/index 누락, transaction/lock scope
 argument-hint: "[파일, diff, 엔드포인트, 쿼리, 리뷰 범위]"
 ---
 
-# Backend Performance Review
+# 백엔드 성능 리뷰
 
 ## 설명
 
@@ -17,6 +17,7 @@ argument-hint: "[파일, diff, 엔드포인트, 쿼리, 리뷰 범위]"
 - `${CLAUDE_PLUGIN_ROOT}/references/performance-checklist.md`
 - `${CLAUDE_PLUGIN_ROOT}/templates/review-finding-template.md`
 - Spring/JPA/Kotlin persistence면 `${CLAUDE_PLUGIN_ROOT}/references/spring-kotlin-backend.md`
+- Spring/Kotlin coroutine/concurrency이면 `spring-coroutine-concurrency` skill 기준을 함께 적용한다.
 
 ## 실행 절차
 
@@ -25,6 +26,7 @@ argument-hint: "[파일, diff, 엔드포인트, 쿼리, 리뷰 범위]"
 3. transaction을 확인한다: lock scope, isolation level, transaction 내부 remote call, per-row flush/write, retry behavior.
 4. application resource를 확인한다: blocking IO, memory aggregation, expensive hot-loop work, cache correctness, timeout, circuit breaker, bounded retry.
 5. JPA/Hibernate에서는 mapper, JSON serialization, logging, DTO construction, collection iteration에서 lazy loading이 발생하는지 본다.
+6. coroutine이면 dispatcher 선택, `Dispatchers.IO` blocking 격리, unbounded fan-out, cancellation/timeout, thread/memory tradeoff를 확인한다.
 
 ## 검증
 
@@ -36,6 +38,7 @@ argument-hint: "[파일, diff, 엔드포인트, 쿼리, 리뷰 범위]"
 - 실수 방지 가드레일: 성능 finding은 재현 조건, 측정 지표, 회귀 검증 방법을 함께 요구한다.
 - 미세 최적화보다 사용자 영향, 부하 상황, 확장성에 영향을 주는 병목을 우선한다.
 - 캐시는 stale data, stampede, invalidation, authorization leakage 위험을 함께 검토한다.
+- `Dispatchers.IO`는 DB pool, 외부 API limit, lock, heap pressure를 해결하지 못하므로 fan-out 경계를 함께 본다.
 
 ## 출력
 

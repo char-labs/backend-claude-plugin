@@ -29,6 +29,7 @@ ROUTES: list[Route] = [
     Route("test", "backend-test-writer", "backend-test-strategy", "단위/통합/회귀/엣지 케이스/TDD/인가 경계 테스트 작성 또는 보강"),
     Route("migration", "migration-planner", "migration-adr", "DB 스키마, 데이터 이관, 스토리지 전환, 서비스 분리, 롤아웃/롤백, ADR이 필요한 마이그레이션"),
     Route("build", "build-validation-specialist", "build-validation", "Gradle, Maven, CI, 컴파일, 테스트 실패, 의존성, protobuf/generated source 검증"),
+    Route("concurrency", "coroutine-concurrency-specialist", "spring-coroutine-concurrency", "Spring Boot + Kotlin coroutine, suspend, coroutineScope/supervisorScope, Dispatchers.IO, blocking IO, 경량 스레드, cancellation/timeout, thread/memory tradeoff"),
     Route("performance", "performance-reviewer", "performance-review", "응답 시간, 처리량, 캐시, 타임아웃, 재시도, 락, 메모리, 커넥션풀, 시스템 병목"),
     Route("review", "backend-reviewer", "review", "PR, diff, 코드리뷰, 감사, 머지 전 검토, 품질 게이트, 전반적 백엔드 리뷰"),
     Route("design", "backend-architect", "design", "백엔드 아키텍처, 서비스 경계, 도메인 모델, 트랜잭션, 권한 소유, 계층 설계"),
@@ -39,22 +40,24 @@ NON_BACKEND_PATTERNS = [
     r"\b(read|show|print|cat|open)\b.*\b(readme|license|changelog|package\.json)\b",
     r"\b(git log|git status|date|time|pwd|ls)\b",
     r"\b(frontend|css|html|figma|image|screenshot|presentation|spreadsheet)\b",
+    r"\bskill\.md\b|\bskill authoring\b|\bskill pattern\b|\bbackend skill\b",
     r"README|리드미|라이선스|체인지로그",
+    r"스킬|SKILL\.md|스킬화|스킬\s*작성|스킬\s*패턴|컨벤션\s*정리|개발\s*워크플로우\s*정리|reference\s*문서|상세\s*참조",
     r"프론트엔드|화면|UI|CSS|HTML|피그마|이미지|스크린샷|발표자료|스프레드시트|엑셀|문서",
     r"최근\s*커밋|현재\s*시간|현재\s*경로|파일\s*목록",
 ]
 
 CATEGORY_PATTERNS: list[tuple[str, list[str]]] = [
     ("security", [r"\bsecurity\b", r"\bauth(orization|entication)?\b", r"\bcsrf\b", r"\bcors\b", r"\bssrf\b", r"\binjection\b", r"\bsecret\b", r"\btoken\b", r"\bjwt\b", r"\bcredential\b", r"\bpermission\b", r"\bprivilege\b", r"\bforbidden\b", r"\bunauthorized\b", r"\banother account\b", r"\banother user's data\b", r"\bcannot read another\b", r"보안|취약점?|취약|인증|인가|권한|접근\s*제어|객체\s*권한|권한\s*상승|권한\s*우회|토큰|JWT|쿠키|세션|CSRF|CORS|SSRF|인젝션|SQL\s*인젝션|시크릿|비밀키|자격\s*증명|개인정보|민감정보|민감\s*데이터|로깅|암호화|해시|레이트\s*리밋|속도\s*제한|탈취|우회|다른\s*계정|다른\s*사용자"]),
-    ("review", [r"\breview\b", r"\bpr\b", r"\bdiff\b", r"\baudit\b", r"\bpre[- ]merge\b", r"리뷰|코드\s*리뷰|검토|검수|감사|\bPR\b|풀리퀘|머지\s*전|변경\s*사항|diff|품질\s*게이트"]),
     ("migration", [r"\bmigrat(e|ion)\b", r"\bbackfill\b", r"\brollout\b", r"\brollback\b", r"\bstrangler\b", r"\bblue[- ]green\b", r"\bdynamodb\b", r"\bstorage\b", r"마이그레이션|전환|이관|백필|backfill|롤아웃|롤백|블루\s*그린|스트랭글러|DynamoDB|스토리지\s*전환|DB\s*전환|스키마\s*변경|데이터\s*이동|무중단"]),
     ("query", [r"\brepository\b", r"\bquerydsl\b", r"\bjpql\b", r"\bsql\b", r"\bjpa\b", r"\bhibernate\b", r"\bn\+1\b", r"\bindex\b", r"\bfetch join\b", r"\bpagination\b", r"\bfindall\b", r"쿼리|레포지토리|리포지토리|저장소|영속성|JPA|하이버네이트|QueryDSL|JPQL|\bSQL\b|N\+1|페치\s*조인|fetch\s*join|인덱스|페이지네이션|페이징|정렬|필터|카운트|count|findAll|조회\s*(쿼리|성능|최적화)?|DB\s*(조회|부하|쿼리)"]),
+    ("concurrency", [r"\bcoroutine(s)?\b", r"\bsuspend\b", r"\bdispatchers?\.io\b", r"\bcoroutinescope\b", r"\bsupervisorscope\b", r"\basync\b", r"\bawait(all)?\b", r"\brunblocking\b", r"\bkotlin\s+flow\b", r"\bflowof\b", r"\bflow\s*[<{]", r"\bstructured concurrency\b", r"\bnon[- ]blocking\b", r"\bblocking io\b", r"코루틴|Coroutine|coroutineScope|supervisorScope|Dispatchers\.IO|런블로킹|runBlocking|비동기|동시성|경량\s*스레드|블로킹\s*IO|논블로킹|suspend|서스펜드|async|await|코틀린\s*Flow|structured\s*concurrency"]),
     ("performance", [r"\bperformance\b", r"\blatency\b", r"\bslow\b", r"\btimeout\b", r"\bretry\b", r"\bcache\b", r"\bredis\b", r"\bmemory\b", r"\block\b", r"\bthroughput\b", r"\btps\b", r"\bconnection pool\b", r"\bhikari\b", r"성능|응답\s*시간|응답이\s*\d+\s*초|지연|느림|느려|병목|처리량|TPS|캐시|Redis|타임아웃|재시도|락|락\s*경합|메모리|스레드|커넥션\s*풀|Hikari|부하|최적화|장애\s*전파"]),
     ("test", [r"\btest\b", r"\bjunit\b", r"\bmockito\b", r"\bmockk\b", r"\btdd\b", r"\bcoverage\b", r"\bregression\b", r"테스트|단위\s*테스트|유닛\s*테스트|통합\s*테스트|회귀\s*테스트|회귀|엣지|경계값|JUnit|Mockito|MockK|TDD|커버리지|테스트\s*커버|검증\s*케이스|실패\s*케이스"]),
     ("build", [r"\bgradle\b", r"\bmaven\b", r"\bci\b", r"\bcompile\b", r"\bbuild\b", r"\bdependency\b", r"\bprotobuf:build\b", r"\bktlint\b", r"\bdetekt\b", r"빌드|컴파일|Gradle|Maven|\bCI\b|파이프라인|의존성|dependency|protobuf|generated|생성\s*코드|ktlint|detekt|린트|정적\s*분석|깨졌|실패|테스트\s*실행"]),
-    ("skill-authoring", [r"\bskill\.md\b", r"\bskill authoring\b", r"\bskill pattern\b", r"\bbackend skill\b", r"스킬|SKILL\.md|스킬화|스킬\s*작성|스킬\s*패턴|패턴\s*정리|컨벤션\s*정리|개발\s*워크플로우\s*정리|reference\s*문서|상세\s*참조"]),
     ("api-contract", [r"\bgraphql\b", r"\bgrpc\b", r"\bproto(buf)?\b", r"\bopenapi\b", r"\brest\b", r"\bendpoint\b", r"\bapi\b", r"\bschema\b", r"\brequest\b", r"\bresponse\b", r"\bdto\b", r"GraphQL|gRPC|Proto|Protobuf|OpenAPI|REST|API|스키마|엔드포인트|입출력|요청|응답|DTO|리졸버|Resolver|컨트랙트|계약|하위\s*호환|필드\s*추가|메서드\s*추가"]),
-    ("design", [r"\bdesign\b", r"\barchitecture\b", r"\bdomain model\b", r"\bboundary\b", r"\btransaction\b", r"\bservice design\b", r"설계|아키텍처|도메인\s*모델|도메인|경계|서비스\s*경계|계층|레이어|트랜잭션|유스케이스|Use\s*Case|책임\s*분리|의존성\s*방향|모듈\s*구조"]),
+    ("review", [r"\breview\b", r"\bpr\b", r"\bdiff\b", r"\baudit\b", r"\bpre[- ]merge\b", r"리뷰|코드\s*리뷰|검토|검수|감사|\bPR\b|풀리퀘|머지\s*전|변경\s*사항|diff|품질\s*게이트"]),
+    ("design", [r"\bdesign\b", r"\barchitecture\b", r"\bdomain model\b", r"\bboundary\b", r"\btransaction\b", r"\bservice design\b", r"\boop\b", r"\bsolid\b", r"\bdesign pattern(s)?\b", r"\bstrategy pattern\b", r"\btemplate method\b", r"\bstate pattern\b", r"\bspecification pattern\b", r"\badapter pattern\b", r"\bdecorator pattern\b", r"\bchain of responsibility\b", r"\bpipeline pattern\b", r"\bstatic factory\b", r"\bfactory method\b", r"\bcompanion object\b", r"\bcriteria pattern\b", r"\bcommand pattern\b", r"\bquery pattern\b", r"\bresult type\b", r"설계|아키텍처|도메인\s*모델|도메인|경계|서비스\s*경계|계층|레이어|트랜잭션|유스케이스|Use\s*Case|책임\s*분리|의존성\s*방향|모듈\s*구조|객체\s*지향|객체지향|디자인\s*패턴|전략\s*패턴|템플릿\s*메서드|상태\s*패턴|명세\s*패턴|정책\s*패턴|어댑터\s*패턴|데코레이터\s*패턴|책임\s*연쇄|파이프라인\s*패턴|정적\s*팩토리|팩토리\s*메서드|Command\s*패턴|Query\s*패턴|Criteria\s*패턴|Result\s*타입"]),
     ("implement", [r"\bimplement\b", r"\bmodify\b", r"\bfix\b", r"\badd\b", r"\bcreate\b", r"\bupdate\b", r"\brefactor\b", r"구현|수정|추가|고쳐|고치|작성|생성|변경|업데이트|리팩터|리팩토링|버그\s*수정|기능\s*추가"]),
 ]
 
@@ -62,7 +65,7 @@ BACKEND_HINTS = [
     r"\bbackend\b", r"\bspring\b", r"\bkotlin\b", r"\bjava\b", r"\bservice\b",
     r"\bcontroller\b", r"\buse case\b", r"\bdatabase\b", r"\bmysql\b",
     r"\bpostgres\b", r"\bredis\b", r"\bkafka\b", r"\bapi\b", r"\bgraphql\b",
-    r"\bgrpc\b", r"\bjpa\b", r"\brepository\b", r"\btransaction\b",
+    r"\bgrpc\b", r"\bjpa\b", r"\brepository\b", r"\btransaction\b", r"\bcoroutine\b", r"\bsuspend\b",
     r"백엔드|서버|서버사이드|스프링|코틀린|자바|서비스|컨트롤러|유스케이스|데이터베이스|DB|레포지토리|리포지토리|트랜잭션|도메인|엔티티|JPA|QueryDSL|GraphQL|gRPC|API",
 ]
 

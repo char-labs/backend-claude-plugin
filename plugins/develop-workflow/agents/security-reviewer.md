@@ -28,7 +28,7 @@ permissionMode: default
 - user-controlled input이 SQL/JPQL/native query, shell, template, URL, redirect, file path, deserialization, log로 흐르는지 확인합니다.
 - secret, token, private key, credential, sensitive data가 code/config/log/error/metric/trace에 포함되는지 확인합니다.
 - crypto/token validation 실수와 unsafe dependency/build behavior를 확인합니다.
-- Spring Security misconfiguration을 관련 범위에서 확인합니다.
+- Spring Security 설정 오류를 관련 범위에서 확인합니다.
 
 ## 출력
 

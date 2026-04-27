@@ -1,10 +1,10 @@
 ---
 name: spring-kotlin-review
-description: Spring Security, JPA/Hibernate query behavior, transaction boundary, Gradle validation, Kotlin nullability, DTO/domain/entity separation, import style을 Spring/Kotlin 관점으로 집중 리뷰할 때 사용.
+description: Spring Security, JPA/Hibernate 쿼리 동작, 트랜잭션 경계, Gradle 검증, Kotlin nullability, DTO/domain/entity 분리, import 스타일을 Spring/Kotlin 관점으로 집중 리뷰할 때 사용.
 argument-hint: "[파일, diff, 엔드포인트, 모듈, 리뷰 범위]"
 ---
 
-# Spring/Kotlin Backend Review
+# Spring/Kotlin 백엔드 리뷰
 
 ## 설명
 
@@ -15,9 +15,11 @@ argument-hint: "[파일, diff, 엔드포인트, 모듈, 리뷰 범위]"
 아래 자료는 필요한 경우에만, 나열된 순서로 읽는다.
 
 - `${CLAUDE_PLUGIN_ROOT}/references/spring-kotlin-backend.md`
+- 객체지향 디자인 패턴이 핵심이면 `${CLAUDE_PLUGIN_ROOT}/references/oop-design-patterns.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/security-checklist.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/performance-checklist.md`
 - `${CLAUDE_PLUGIN_ROOT}/templates/review-finding-template.md`
+- Spring/Kotlin coroutine/concurrency이면 `spring-coroutine-concurrency` skill 기준을 함께 적용한다.
 
 ## 실행 절차
 
@@ -25,7 +27,16 @@ argument-hint: "[파일, diff, 엔드포인트, 모듈, 리뷰 범위]"
 2. JPA/Hibernate를 확인한다: N+1, mapper/serializer/logging lazy loading, fetch join/entity graph/projection, bulk update, `open-in-view` reliance.
 3. transaction을 확인한다: use-case ownership, `readOnly`, write boundary, transaction 내부 remote call, event consistency.
 4. Kotlin/Java import를 확인한다: nullability contract, 불필요한 `!!`, immutable command/value object, 코드 본문/하단 영역의 inline fully qualified reference 금지, Java static member의 `import static` 사용.
-5. Gradle validation을 확인한다: existing `./gradlew` task, scoped module test, ktlint/detekt 존재 여부, 자동 dependency 설치 금지.
+5. Kotlin 파일 구성을 확인한다: 여러 data class는 기본 지양하되 같은 부모 컨텍스트의 nested type 또는 응답 wrapper + DTO는 허용한다.
+6. service 내부 private method가 비즈니스 책임을 숨기는지 확인하고, 필요한 경우 역할 컴포넌트 추출을 제안한다.
+7. Facade/Service 패턴을 확인한다: 복잡한 비즈니스 조합은 Facade, 단일 도메인 책임은 Service를 사용하고 Facade는 Service만 의존한다.
+8. Kotlin 확장 함수 패턴을 확인한다: 여러 class에서 반복될 순수 helper는 `common`, `support`, `util` 또는 도메인 support 패키지의 top-level extension으로 둔다.
+9. Kotlin idiom을 확인한다: scope function은 의도별로 쓰고, enum/sealed/status/type 분기는 exhaustive `when`과 `is` smart cast를 우선 고려한다.
+10. 정적 팩토리와 message type을 확인한다: 의미 있는 생성은 `from`/`of`/`create`, Service 결과는 `*Result`, 입력 목적은 `*Command`/`*Query`/`*Criteria`로 드러낸다.
+11. `toDomain()` 변환을 확인한다: Entity/input model/command-like data class의 순수 domain mapping은 `toDomain()`으로 모으고, repository/client 호출, 인가, 트랜잭션, lazy association traversal은 넣지 않는다.
+12. 반복 분기와 생명주기 행위를 확인한다: Strategy, Template Method, State, Specification/Policy, Adapter/Port가 Spring 계층 경계를 선명하게 하는지 본다.
+13. coroutine/concurrency를 확인한다: `coroutineScope`, `supervisorScope`, `Dispatchers.IO`, blocking 요소, bounded fan-out, cancellation/timeout.
+14. Gradle validation을 확인한다: existing `./gradlew` task, scoped module test, ktlint/detekt 존재 여부, 자동 dependency 설치 금지.
 
 ## 검증
 
@@ -39,6 +50,14 @@ argument-hint: "[파일, diff, 엔드포인트, 모듈, 리뷰 범위]"
 - Spring annotation만 보고 보안/트랜잭션이 충분하다고 가정하지 않는다.
 - Entity를 API response로 직접 노출하거나 lazy association을 serialization에 맡기지 않는다.
 - import style은 엄격히 적용한다. 코드 본문/하단 영역에 `com.example.Foo`처럼 직접 쓰지 말고 파일 상단 import로 올리며, Java static member는 `import static`을 사용한다.
+- data class를 여러 개 넣는 파일은 같은 API/도메인 컨텍스트인지 확인한다. 독립적으로 재사용될 수 있으면 분리한다.
+- Facade는 Service만 constructor dependency로 받는다. Repository, EntityManager, client, mapper, port가 필요하면 Service 뒤로 이동시킨다.
+- 확장 함수에는 repository/client 호출, transaction, authorization, business policy를 넣지 않는다. 그런 로직은 Service나 역할 컴포넌트가 소유한다.
+- scope function은 가독성을 높일 때 적극 사용한다. 다만 중첩 `it`, 모호한 receiver, side effect가 숨겨지는 긴 chain은 피한다.
+- companion object 정적 팩토리와 `*Result`/`*Command`/`*Query`/`*Criteria`는 Spring/Kotlin application boundary를 선명하게 하는 기본 선호 규칙으로 본다.
+- `toDomain()`은 현재 객체 값만 사용하는 순수 변환으로 유지한다. 생성 정책이나 invariant가 복잡하면 `Domain.create(...)` 또는 별도 factory로 이동한다.
+- 디자인 패턴은 Spring component graph와 transaction boundary를 흐리지 않아야 한다. Pattern 구현이 Repository/client/transaction을 숨기면 Service나 Adapter로 이동시킨다.
+- coroutine은 blocking 여부, dispatcher 선택, transaction/security/MDC context, thread/memory tradeoff를 함께 검토한다.
 
 ## 출력
 

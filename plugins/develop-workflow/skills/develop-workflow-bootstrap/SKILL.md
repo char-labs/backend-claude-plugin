@@ -4,7 +4,7 @@ description: develop-workflow 플러그인 초기 구조와 분리 상태를 점
 argument-hint: "[분리 상태 점검 또는 초기 스캐폴드 확인]"
 ---
 
-# Develop Workflow Bootstrap
+# 개발 워크플로우 부트스트랩
 
 ## 설명
 
@@ -22,4 +22,8 @@ argument-hint: "[분리 상태 점검 또는 초기 스캐폴드 확인]"
 
 ## 주의사항
 
-- 기존 단일 플러그인 동작을 깨지 않도록 병행 운영한다.
+- 실수 방지 가드레일: backend 개발 컨텍스트는 `develop-workflow`, Git guard는 `git-utils`, authoring guide는 `workflow-guide`가 소유하도록 중복을 만들지 않는다.
+
+## 출력
+
+현재 구조 점검 결과, 누락된 디렉토리/파일, 필요한 검증 명령을 요약한다.

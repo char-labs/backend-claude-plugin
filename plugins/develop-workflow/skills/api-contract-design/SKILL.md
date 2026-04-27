@@ -4,7 +4,7 @@ description: GraphQL, gRPC/protobuf, REST/OpenAPI, DTO, pagination, error shape,
 argument-hint: "[API 계약 설계 작업]"
 ---
 
-# API Contract Design
+# API 계약 설계
 
 ## 설명
 

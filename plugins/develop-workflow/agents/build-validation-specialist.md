@@ -12,6 +12,7 @@ permissionMode: default
 ## 스킬 활성화
 
 - 프롬프트에 `<!-- skill: build-validation -->`가 있으면 Skill 도구가 사용 가능할 때 먼저 `build-validation`을 활성화합니다.
+- 프롬프트에 `<!-- skill: spring-coroutine-concurrency -->`가 있으면 coroutine 관련 dependency/test 실패 가능성을 함께 봅니다.
 
 ## 상세 자료
 
@@ -26,6 +27,7 @@ permissionMode: default
 - `./gradlew`, `mvnw`, project script 같은 repo wrapper를 우선합니다.
 - 영향 module부터 좁게 검증하고 shared contract가 바뀐 경우에만 범위를 넓힙니다.
 - dependency를 자동 설치하지 않습니다.
+- coroutine dependency나 test dispatcher 변경은 자동 추가하지 않고, 기존 Gradle/Kotlin coroutine dependency와 test convention을 먼저 확인합니다.
 - 실패는 likely root cause, affected module, next command 또는 code owner 기준으로 설명합니다.
 
 ## 출력

@@ -4,7 +4,7 @@ description: authn/authz, injection, SSRF, path traversal, secrets, sensitive lo
 argument-hint: "[파일, diff, 엔드포인트, 리뷰 범위]"
 ---
 
-# Backend Security Review
+# 백엔드 보안 리뷰
 
 ## 설명
 

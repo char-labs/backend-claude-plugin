@@ -1,28 +1,28 @@
-# Migration Playbook
+# 마이그레이션 플레이북
 
-Use this reference for schema, data, storage, service, or contract migrations.
+schema, data, storage, service, contract migration에서 이 자료를 사용한다.
 
-## Plan Shape
+## 계획 구조
 
-- Current state: data model, traffic, writers/readers, owners, dependencies, and known risks.
-- Target state: desired model, compatibility contract, operational requirements, and acceptance criteria.
-- Strategy: expand/contract, dual-write, backfill, replay, blue-green, strangler, or big-bang with explicit rationale.
-- Rollout: stages, feature flags, traffic slices, validation gates, and rollback points.
-- Observability: metrics, logs, alerts, dashboards, and manual checks.
+- 현재 상태: data model, traffic, writer/reader, owner, dependency, known risk.
+- 목표 상태: 원하는 model, compatibility contract, operational requirement, acceptance criteria.
+- 전략: expand/contract, dual-write, backfill, replay, blue-green, strangler, big-bang 중 하나를 선택하고 명시적 근거를 둔다.
+- rollout: stage, feature flag, traffic slice, validation gate, rollback point.
+- 관측성: metric, log, alert, dashboard, manual check.
 
-## Data Safety
+## 데이터 안전성
 
-- Define source of truth during each phase.
-- Make backfills idempotent and resumable.
-- Protect against duplicate writes, lost updates, partial replay, and out-of-order events.
-- Validate counts, checksums, constraints, and business invariants.
+- 각 phase의 source of truth를 정의한다.
+- backfill은 idempotent하고 resumable하게 만든다.
+- duplicate write, lost update, partial replay, out-of-order event를 방지한다.
+- count, checksum, constraint, business invariant를 검증한다.
 
-## Compatibility
+## 호환성
 
-- Preserve API/protobuf/schema compatibility unless a breaking change is approved.
-- Support old and new readers/writers during transition when needed.
-- Version messages, columns, events, or endpoints only when additive compatibility is insufficient.
+- breaking change가 승인되지 않았다면 API/protobuf/schema compatibility를 보존한다.
+- 필요하면 전환 중 old/new reader와 writer를 함께 지원한다.
+- additive compatibility만으로 부족할 때만 message, column, event, endpoint에 version을 둔다.
 
-## ADR Triggers
+## ADR 작성 트리거
 
-- New storage technology, new service boundary, major schema redesign, auth model change, consistency model change, or external provider replacement.
+- 새로운 storage technology, 새로운 service boundary, 큰 schema redesign, auth model 변경, consistency model 변경, external provider 교체.

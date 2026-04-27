@@ -18,6 +18,7 @@ permissionMode: default
 아래 자료는 필요한 경우에만, 나열된 순서로 읽습니다.
 
 - `${CLAUDE_PLUGIN_ROOT}/references/architecture-principles.md`
+- `${CLAUDE_PLUGIN_ROOT}/references/oop-design-patterns.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/spring-kotlin-backend.md`
 - `${CLAUDE_PLUGIN_ROOT}/templates/review-finding-template.md`
 
@@ -28,6 +29,14 @@ permissionMode: default
 - domain behavior가 controller, mapper, repository, utility에 흩어졌는지 확인합니다.
 - high-level policy가 concrete infrastructure에 직접 의존하는지 확인합니다.
 - oversized interface, leaky abstraction, hidden global state, hard-to-test collaborator를 확인합니다.
+- private method chain이 별도 비즈니스 책임을 숨기는지 확인합니다. 이름 붙일 수 있는 행동이면 역할 컴포넌트 추출을 finding으로 제안합니다.
+- Facade가 Service 외 의존성을 직접 받거나 단일 도메인 책임을 가져가는지 확인합니다.
+- 반복되는 순수 helper가 private method나 흩어진 메서드로 깊이를 늘리면 공용/도메인 확장 함수 추출을 제안합니다.
+- Kotlin 코드에서는 scope function, `when`, `is` smart cast가 중복 분기와 타입 처리 depth를 줄이는지 확인합니다.
+- 정적 팩토리와 application message type을 확인합니다. 생성 의도는 `from`/`of`/`create`, Service 결과는 `*Result`, 입력 목적은 `*Command`/`*Query`/`*Criteria`로 드러나는지 봅니다.
+- Strategy, Template Method, State, Specification/Policy, Adapter/Port, Decorator, Chain/Pipeline, Factory, Command Handler 후보를 변경 축과 테스트 가능성 기준으로 확인합니다.
+- 패턴 과잉 설계를 확인합니다. pattern 이름이 책임 분리보다 파일 수만 늘리면 finding으로 봅니다.
+- 여러 data class가 한 kt 파일에 있을 때 같은 컨텍스트인지 확인합니다. nested type 또는 응답 wrapper + DTO는 허용하고, 독립 개념이면 분리 제안을 합니다.
 - Kotlin/Spring pattern이 nullability, import, transaction ownership, layer boundary를 약화시키는지 확인합니다.
 
 ## 출력

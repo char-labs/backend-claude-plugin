@@ -4,7 +4,7 @@ description: DB 스키마 변경, 데이터 backfill, storage 전환, 서비스 
 argument-hint: "[마이그레이션 또는 ADR 작업]"
 ---
 
-# Migration ADR
+# 마이그레이션 ADR
 
 ## 설명
 

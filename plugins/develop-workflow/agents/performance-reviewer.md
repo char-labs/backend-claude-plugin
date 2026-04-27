@@ -12,6 +12,7 @@ permissionMode: default
 ## 스킬 활성화
 
 - 프롬프트에 `<!-- skill: performance-review -->`가 있으면 Skill 도구가 사용 가능할 때 먼저 `performance-review`를 활성화합니다.
+- 프롬프트에 `<!-- skill: spring-coroutine-concurrency -->`가 있으면 Skill 도구가 사용 가능할 때 먼저 `spring-coroutine-concurrency`를 활성화합니다.
 
 ## 상세 자료
 
@@ -28,6 +29,7 @@ permissionMode: default
 - pagination/limit/index 누락, broad fetch, expensive count query를 확인합니다.
 - long transaction, lock contention, transaction 내부 remote call, per-item flush/write를 확인합니다.
 - blocking IO, unbounded memory aggregation, cache stampede, missing timeout, retry amplification을 확인합니다.
+- coroutine이면 dispatcher 선택, blocking 격리, bounded fan-out, cancellation/timeout, DB pool/external limit, heap pressure를 확인합니다.
 
 ## 출력
 

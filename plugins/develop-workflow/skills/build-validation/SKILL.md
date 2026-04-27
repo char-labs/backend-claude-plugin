@@ -4,7 +4,7 @@ description: Gradle, Maven, CI 실패, dependency 변경, compile/test 실패, p
 argument-hint: "[빌드, CI, 검증 작업]"
 ---
 
-# Build Validation
+# 빌드 검증
 
 ## 설명
 

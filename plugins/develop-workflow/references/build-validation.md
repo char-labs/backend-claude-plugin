@@ -1,23 +1,23 @@
-# Build Validation Reference
+# 빌드 검증 참고 자료
 
-Use this reference for build, CI, generated source, dependency, and validation workflow decisions.
+build, CI, generated source, dependency, validation workflow 결정을 할 때 이 자료를 사용한다.
 
-## Command Discovery
+## 명령 탐색
 
-- Prefer project wrappers: `./gradlew`, `./mvnw`, repo scripts, package-manager scripts.
-- Detect changed modules from paths and existing build files.
-- Validate generated sources before dependent modules when protobuf/OpenAPI/schema generation changed.
-- Do not install dependencies automatically. Recommend explicit commands only.
+- `./gradlew`, `./mvnw`, repo script, package-manager script 같은 project wrapper를 우선한다.
+- path와 기존 build file을 기준으로 변경된 module을 감지한다.
+- protobuf/OpenAPI/schema generation이 변경되면 dependent module보다 generated source를 먼저 검증한다.
+- dependency를 자동 설치하지 않는다. 명시적 command만 추천한다.
 
-## JVM Backend Defaults
+## JVM 백엔드 기본값
 
-- Gradle compile: `./gradlew :module:compileKotlin` or `./gradlew :module:compileJava`.
-- Tests: `./gradlew :module:test`.
-- Kotlin lint/static analysis: `./gradlew ktlintCheck`, `./gradlew detekt`, or local equivalents when present.
-- Protobuf: build the protobuf module before modules that consume generated stubs.
+- Gradle compile: `./gradlew :module:compileKotlin` 또는 `./gradlew :module:compileJava`.
+- 테스트: `./gradlew :module:test`.
+- Kotlin lint/static analysis: 존재한다면 `./gradlew ktlintCheck`, `./gradlew detekt`, 또는 local equivalent.
+- Protobuf: generated stub을 소비하는 module보다 protobuf module을 먼저 build한다.
 
-## Failure Triage
+## 실패 분류
 
-- Separate source compile errors, generated source errors, dependency resolution, test failure, lint/style, and environment failure.
-- Report first failing module, first meaningful stack/error line, likely owner, and next command.
-- If a command cannot run due environment or network limits, state the residual risk.
+- source compile error, generated source error, dependency resolution, test failure, lint/style, environment failure를 구분한다.
+- 첫 실패 module, 의미 있는 첫 stack/error line, likely owner, 다음 command를 보고한다.
+- 환경 또는 network limit 때문에 command를 실행할 수 없으면 residual risk를 명시한다.

@@ -12,6 +12,7 @@ permissionMode: default
 ## 스킬 활성화
 
 - 프롬프트에 `<!-- skill: review -->`가 있으면 Skill 도구가 사용 가능할 때 먼저 `review`를 활성화합니다.
+- 프롬프트에 `<!-- skill: spring-coroutine-concurrency -->`가 있으면 Skill 도구가 사용 가능할 때 먼저 `spring-coroutine-concurrency`를 활성화합니다.
 
 ## 상세 자료
 
@@ -19,6 +20,7 @@ permissionMode: default
 
 - `${CLAUDE_PLUGIN_ROOT}/templates/review-finding-template.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/architecture-principles.md`
+- `${CLAUDE_PLUGIN_ROOT}/references/oop-design-patterns.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/security-checklist.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/performance-checklist.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/spring-kotlin-backend.md`
@@ -28,6 +30,16 @@ permissionMode: default
 - 실수 방지 가드레일로 finding마다 evidence, impact, fix, test expectation을 요구합니다.
 - architecture boundary, transaction ownership, dependency direction, error boundary를 확인합니다.
 - 실제 maintainability/testability risk를 만드는 SOLID/OOP 문제만 finding으로 냅니다.
+- private method chain에 비즈니스 책임이 숨겨졌는지 확인하고, 이름 붙일 수 있는 행동이면 역할 컴포넌트 추출을 제안합니다.
+- Facade/Service 경계를 확인합니다. Facade는 복잡한 비즈니스 조합에만 쓰고 Service만 의존해야 하며, 단일 도메인 책임은 Service로 내려야 합니다.
+- 반복되는 private helper나 흩어진 메서드가 call depth를 늘리면 확장 함수 후보인지 확인합니다. 단, business policy나 의존성 있는 로직은 extension으로 옮기지 않습니다.
+- Kotlin idiom을 확인합니다. scope function, exhaustive `when`, `is` smart cast, null-safety, collection operation이 실제로 readability를 높이는 경우 제안합니다.
+- 정적 팩토리와 message type을 확인합니다. 의미 있는 생성은 `from`/`of`/`create`, Service 결과는 `*Result`, 입력 목적은 `*Command`/`*Query`/`*Criteria`로 드러나는지 봅니다.
+- `toDomain()` mapping을 확인합니다. Entity/input model/command-like data class에서 domain model로 가는 순수 변환은 `toDomain()`으로 모이고, repository/client 호출, 인가, 트랜잭션, lazy association traversal을 숨기지 않는지 봅니다.
+- 디자인 패턴을 확인합니다. 반복 조건문, 워크플로우 골격, 상태별 행위, provider 경계는 Strategy/Template Method/State/Specification/Adapter 등으로 책임과 테스트 가능성이 좋아지는지 봅니다.
+- 패턴 과잉 설계도 finding이 될 수 있습니다. 단일 구현 interface, 불필요한 abstract class, 숨겨진 decorator side effect, 테스트되지 않은 pipeline 순서를 확인합니다.
+- coroutine/concurrency를 확인합니다. `Dispatchers.IO`, blocking call, unbounded fan-out, `runBlocking`, cancellation, timeout, thread/memory tradeoff를 함께 봅니다.
+- 여러 data class가 한 kt 파일에 있을 때 같은 컨텍스트인지 확인합니다. 같은 API/도메인 컨텍스트는 허용하고, 독립 개념이면 분리 제안을 합니다.
 - security vulnerability와 missing control을 확인합니다.
 - query/application performance bottleneck을 확인합니다.
 - 중요한 behavior와 failure path에 대한 테스트 누락을 확인합니다.
