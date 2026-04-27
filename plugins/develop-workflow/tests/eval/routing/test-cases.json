@@ -140,6 +140,27 @@
     "expected_skill": null
   },
   {
+    "id": "K10",
+    "type": "korean",
+    "prompt": "PostEntity에 userId만 두고 조인으로 조회하고 싶어",
+    "expected_agent": "persistence-query-specialist",
+    "expected_skill": "persistence-query-review"
+  },
+  {
+    "id": "K11",
+    "type": "korean",
+    "prompt": "@ManyToOne 쓰지 말고 FK 기반으로 바꿔줘",
+    "expected_agent": "persistence-query-specialist",
+    "expected_skill": "persistence-query-review"
+  },
+  {
+    "id": "K12",
+    "type": "korean",
+    "prompt": "@ManyToMany 대신 연결 엔티티로 설계해줘",
+    "expected_agent": "persistence-query-specialist",
+    "expected_skill": "persistence-query-review"
+  },
+  {
     "id": "C01",
     "type": "direct",
     "prompt": "Review this Spring Kotlin coroutineScope code and check Dispatchers.IO for blocking calls",

@@ -1,6 +1,6 @@
 ---
 name: design
-description: 서비스/도메인/트랜잭션/인가/영속성 경계를 포함한 백엔드 아키텍처를 설계할 때 사용. API wire schema는 api-contract-design, 단계적 이관은 migration-adr를 우선 사용.
+description: 서비스/도메인/트랜잭션/인가/영속성 경계를 포함한 백엔드 아키텍처를 설계할 때 사용. JPA 관계 어노테이션, scalar FK, 연결 엔티티 설계도 포함한다. API wire schema는 api-contract-design, 단계적 이관은 migration-adr를 우선 사용.
 argument-hint: "[기능 또는 설계 요청]"
 ---
 
@@ -35,12 +35,14 @@ argument-hint: "[기능 또는 설계 요청]"
 8. 여러 class에서 반복될 Kotlin helper 패턴은 private method로 흩어 두지 않고 `common`, `support`, `util` 또는 도메인 support 패키지의 확장 함수 후보로 설계한다.
 9. Kotlin이면 scope function, `when`, `is` smart cast, null-safety, collection operation을 활용해 분기와 변환을 읽기 쉽게 설계한다.
 10. 생성 의도나 invariant가 있는 객체는 companion object 정적 팩토리(`from`, `of`, `create`)를 우선 설계한다.
-11. Entity/input model/command-like data class에서 domain model로 가는 순수 변환은 `toDomain()`으로 설계한다. 생성 정책이 복잡하면 domain factory로 분리한다.
-12. Service/use-case 출력은 명시적 `*Result`로 설계하고, write/read/filter 입력은 `*Command`, `*Query`, `*Criteria`로 목적을 분리한다.
-13. 반복 분기, 정책 선택, 안정된 워크플로우, 상태별 행위, 외부 provider 경계가 있으면 Strategy, Template Method, State, Specification/Policy, Adapter/Port, Decorator, Chain/Pipeline, Factory 중 필요한 패턴을 검토한다.
-14. coroutine을 쓰면 도입 이유, blocking 요소, dispatcher 선택, structured concurrency, bounded fan-out, thread/memory tradeoff를 명시한다.
-15. Spring/Kotlin/Java이면 `@Transactional`, Spring Security, DTO/domain/entity 분리, JPA fetch strategy, Gradle validation, 파일 상단 import, Java `import static`, data class 파일 분리/중첩 허용 기준을 명시한다.
-16. 기존 도구에 맞는 test와 validation command로 마무리한다.
+11. 신규 JPA Entity는 `PostEntity(val userId: Long, ...)`처럼 scalar FK를 우선 설계한다. `@ManyToOne`, `@OneToMany`, `@ManyToMany`, `JoinColumn` 관계 어노테이션은 legacy/명시 승인 예외로만 둔다.
+12. Entity/input model/command-like data class에서 domain model로 가는 순수 변환은 `toDomain()`으로 설계한다. `toDomain()`은 현재 값과 scalar FK만 사용하고 lazy association traversal이나 관계 어노테이션 탐색을 넣지 않는다.
+13. Service/use-case 출력은 명시적 `*Result`로 설계하고, write/read/filter 입력은 `*Command`, `*Query`, `*Criteria`로 목적을 분리한다.
+14. 다대다는 `@ManyToMany`가 아니라 `PostTagEntity(postId, tagId)` 같은 연결 엔티티와 명시 조인/projection으로 설계한다.
+15. 반복 분기, 정책 선택, 안정된 워크플로우, 상태별 행위, 외부 provider 경계가 있으면 Strategy, Template Method, State, Specification/Policy, Adapter/Port, Decorator, Chain/Pipeline, Factory 중 필요한 패턴을 검토한다.
+16. coroutine을 쓰면 도입 이유, blocking 요소, dispatcher 선택, structured concurrency, bounded fan-out, thread/memory tradeoff를 명시한다.
+17. Spring/Kotlin/Java이면 `@Transactional`, Spring Security, DTO/domain/entity 분리, scalar FK 기반 JPA entity policy, JPA fetch strategy, Gradle validation, 파일 상단 import, Java `import static`, data class 파일 분리/중첩 허용 기준을 명시한다.
+18. 기존 도구에 맞는 test와 validation command로 마무리한다.
 
 ## 검증
 
@@ -55,6 +57,8 @@ argument-hint: "[기능 또는 설계 요청]"
 - 여러 data class를 한 `.kt` 파일에 둘 때는 같은 컨텍스트의 nested command/info/result 또는 응답 wrapper + DTO처럼 응집된 경우에만 허용한다.
 - Facade는 여러 Service를 엮는 조합 계층으로만 둔다. Repository, EntityManager, 외부 client, mapper, port를 Facade에 직접 주입하지 않는다.
 - 확장 함수에는 외부 의존성, repository/client 호출, 인가, 트랜잭션, 비즈니스 정책을 숨기지 않는다.
+- 신규 Entity 설계에서 관계 어노테이션을 기본값으로 제안하지 않는다. 객체 그래프 탐색보다 scalar FK, Repository 명시 조인, projection, `*Result` 경계를 우선한다.
+- `@ManyToMany`는 신규 설계에서 사용하지 않는다. 연결 엔티티를 만들고 audit, 권한, 삭제 정책, index를 명시한다.
 - scope function은 의도를 드러낼 때 사용한다. 중첩 `it`이나 긴 chain으로 receiver와 side effect가 흐려지면 지역 변수나 명시적 lambda name을 쓴다.
 - 정적 팩토리는 생성 의미가 있는 곳에 적극 사용한다. 단순 테스트 fixture나 의미 없는 값 보관용 constructor까지 억지로 감싸지는 않는다.
 - `toDomain()`은 순수 mapping으로 설계한다. repository/client 호출, 인가, 트랜잭션, lazy loading이 필요한 변환이면 Service나 factory 책임으로 올린다.

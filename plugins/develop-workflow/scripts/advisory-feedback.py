@@ -75,6 +75,20 @@ def controller_or_presentation_test(path: str) -> bool:
     )
 
 
+def entityish(path: str) -> bool:
+    normalized = path.replace("\\", "/")
+    lowered = normalized.lower()
+    name = Path(normalized).name.lower()
+    return (
+        ("src/main/" in lowered or "/src/main/" in lowered)
+        and (
+            "/entity/" in lowered
+            or name.endswith("entity.kt")
+            or name.endswith("entity.java")
+        )
+    )
+
+
 def post_tool(data: dict) -> None:
     tool_input = data.get("tool_input", {})
     if not isinstance(tool_input, dict):
@@ -90,6 +104,11 @@ def post_tool(data: dict) -> None:
     if testish(path):
         emit(
             "Backend test 안내: 비즈니스 로직, 분기, 인가, 쿼리, 오류 처리, 회귀 위험을 증명할 때만 테스트를 작성하세요. 단순 DTO/상수/설정 변경이면 새 테스트보다 compile/static validation을 우선하세요. 실 DB와 테스트 @Transactional rollback에는 의존하지 마세요."
+        )
+        return
+    if entityish(path):
+        emit(
+            "JPA Entity 안내: 신규 Entity는 @ManyToOne/@OneToMany/@ManyToMany/JoinColumn 관계 어노테이션보다 userId, postId 같은 scalar FK를 우선하세요. 조회 조합은 Repository/QueryDSL/SQL/JPQL 명시 조인과 projection으로 만들고, 다대다는 연결 엔티티를 사용하세요."
         )
         return
     emit(

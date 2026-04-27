@@ -5,6 +5,8 @@
 ## 데이터베이스와 쿼리 병목
 
 - lazy loading, row별 repository call, resolver loop, mapper-triggered fetch에서 N+1 query pattern을 찾는다.
+- 신규 Entity의 `@ManyToOne`, `@OneToMany`, `@ManyToMany` 관계 어노테이션이 lazy loading, broad graph fetch, cascade 비용, serializer fetch를 숨기는지 확인한다. 기본 fix는 scalar FK + 명시 조인/projection이다.
+- `@ManyToMany`는 연결 엔티티 없이 join table lifecycle을 숨기므로 hot path와 삭제/수정 경로에서 성능 finding 후보로 본다.
 - unbounded read, pagination 누락, limit 누락, 넓은 `findAll`, 전체 object graph loading을 확인한다.
 - 자주 쓰이는 filter, join, ordering, uniqueness check, foreign key에 필요한 index를 확인한다.
 - non-sargable predicate, leading wildcard search, indexed column에 대한 function, implicit cast, 불안정한 query plan을 찾는다.

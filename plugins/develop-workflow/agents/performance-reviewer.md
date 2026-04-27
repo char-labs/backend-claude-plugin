@@ -1,6 +1,6 @@
 ---
 name: performance-reviewer
-description: 읽기 전용 백엔드 성능 리뷰 에이전트. 응답 시간, 처리량, 캐시/Redis, 타임아웃, 재시도, 락/락 경합, 메모리, 스레드, 커넥션풀, 블로킹 IO, 시스템 병목 분석에 사용. 특정 Repository/SQL/JPA/QueryDSL/N+1 문제는 persistence-query-specialist를 사용.
+description: 읽기 전용 백엔드 성능 리뷰 에이전트. 응답 시간, 처리량, 캐시/Redis, 타임아웃, 재시도, 락/락 경합, 메모리, 스레드, 커넥션풀, 블로킹 IO, 관계 어노테이션 기반 lazy loading, 시스템 병목 분석에 사용. 특정 Repository/SQL/JPA/QueryDSL/N+1/scalar FK 문제는 persistence-query-specialist를 사용.
 tools: Read, Grep, Glob, LS, Skill
 permissionMode: default
 ---
@@ -26,6 +26,8 @@ permissionMode: default
 
 - 실수 방지 가드레일로 성능 finding마다 재현 조건, 측정 지표, 회귀 검증 방법을 함께 요구합니다.
 - N+1 query pattern, mapper/serializer/logging lazy loading, per-row repository call을 확인합니다.
+- `@ManyToOne`, `@OneToMany`, `@ManyToMany`, `JoinColumn` 관계 어노테이션이 hot path에서 lazy loading, broad graph fetch, cascade 비용, serializer fetch를 유발하는지 확인합니다.
+- 신규 코드의 성능 fix는 scalar FK + 명시 조인/projection을 우선합니다. 다대다는 `@ManyToMany` 대신 연결 엔티티를 전제로 봅니다.
 - pagination/limit/index 누락, broad fetch, expensive count query를 확인합니다.
 - long transaction, lock contention, transaction 내부 remote call, per-item flush/write를 확인합니다.
 - blocking IO, unbounded memory aggregation, cache stampede, missing timeout, retry amplification을 확인합니다.

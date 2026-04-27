@@ -161,6 +161,36 @@ def assert_test_db_and_controller_policy() -> None:
             fail(f"test DB/controller policy must mention Controller/Presentation or Presentation/Controller: {path}")
 
 
+def assert_jpa_scalar_fk_relation_policy() -> None:
+    workflow_guide = ROOT.parent / "workflow-guide"
+    required_files = [
+        ROOT / "references" / "spring-kotlin-backend.md",
+        ROOT / "references" / "persistence-query-patterns.md",
+        ROOT / "references" / "performance-checklist.md",
+        ROOT / "skills" / "design" / "SKILL.md",
+        ROOT / "skills" / "implement" / "SKILL.md",
+        ROOT / "skills" / "persistence-query-review" / "SKILL.md",
+        ROOT / "skills" / "spring-kotlin-review" / "SKILL.md",
+        ROOT / "skills" / "performance-review" / "SKILL.md",
+        ROOT / "skills" / "review" / "SKILL.md",
+        ROOT / "agents" / "backend-architect.md",
+        ROOT / "agents" / "backend-coder.md",
+        ROOT / "agents" / "backend-reviewer.md",
+        ROOT / "agents" / "persistence-query-specialist.md",
+        ROOT / "agents" / "performance-reviewer.md",
+        ROOT / "agents" / "oop-solid-reviewer.md",
+        ROOT / "scripts" / "route-user-prompt.py",
+        ROOT / "scripts" / "advisory-feedback.py",
+        workflow_guide / "references" / "backend-skill-authoring-patterns.md",
+        workflow_guide / "templates" / "backend-domain-skill-template.md",
+    ]
+    for path in required_files:
+        text = read(path)
+        for marker in ("scalar FK", "관계 어노테이션", "연결 엔티티"):
+            if marker not in text:
+                fail(f"JPA scalar FK relation policy must mention {marker}: {path}")
+
+
 def main() -> None:
     assert_unique_case_ids()
     assert_hook_policy()
@@ -170,6 +200,7 @@ def main() -> None:
     assert_gitignore_noise_policy()
     assert_test_minimalism_policy()
     assert_test_db_and_controller_policy()
+    assert_jpa_scalar_fk_relation_policy()
     print("guardrail policy tests passed")
 
 

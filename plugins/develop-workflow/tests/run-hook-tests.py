@@ -69,6 +69,11 @@ def main() -> None:
         {"tool_name": "Write", "tool_input": {"file_path": "src/test/kotlin/UserControllerTest.kt"}},
         "Controller/Presentation",
     )
+    assert_advisory_contains(
+        "emits entity relation policy advisory",
+        {"tool_name": "Write", "tool_input": {"file_path": "src/main/kotlin/com/example/entity/PostEntity.kt"}},
+        "scalar FK",
+    )
     assert_advisory("emits stop advisory", {"hook_event_name": "Stop"}, "stop")
     assert_route(
         "routes query work",

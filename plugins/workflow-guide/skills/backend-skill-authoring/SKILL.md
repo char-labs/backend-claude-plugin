@@ -1,6 +1,6 @@
 ---
 name: backend-skill-authoring
-description: 백엔드 도메인 컨벤션 스킬 작성/개선 가이드. Entity, Repository, QueryDSL, GraphQL, gRPC, Gradle, 테스트, ADR 같은 프로젝트 전용 SKILL.md와 상세 reference를 만들거나 정리할 때 사용.
+description: 백엔드 도메인 컨벤션 스킬 작성/개선 가이드. Entity, scalar FK, 관계 어노테이션 지양, 연결 엔티티, Repository, QueryDSL, GraphQL, gRPC, Gradle, 테스트, ADR 같은 프로젝트 전용 SKILL.md와 상세 reference를 만들거나 정리할 때 사용.
 argument-hint: "[스킬로 만들 백엔드 컨벤션 또는 기존 SKILL.md]"
 ---
 
@@ -29,10 +29,11 @@ argument-hint: "[스킬로 만들 백엔드 컨벤션 또는 기존 SKILL.md]"
 8. 반복될 Kotlin helper는 private method로 흩지 않고 `common`, `support`, `util` 또는 도메인 support 패키지의 확장 함수로 추출하는 기준을 포함한다.
 9. scope function, `when`, `is` smart cast, null-safety, collection operation 같은 Kotlin idiom을 가독성/유지보수성 기준과 함께 포함한다.
 10. companion object 정적 팩토리(`from`, `of`, `create`), `toDomain()` 순수 mapping, Service `*Result`, `*Command`, `*Query`, `*Criteria` 기준을 포함한다.
-11. 객체지향 디자인 패턴 기준을 포함한다: Strategy, Template Method, State, Specification/Policy, Adapter/Port, Decorator, Chain/Pipeline, Factory를 문제 축과 함께 설명한다.
-12. coroutine 스킬이면 blocking 요소, dispatcher 선택, structured concurrency, bounded fan-out, thread/memory tradeoff를 포함한다.
-13. kt 파일의 여러 data class는 기본 지양하되, 같은 부모 컨텍스트의 nested command/info/result 또는 응답 wrapper + DTO 예외를 명시한다.
-14. Maum 같은 특정 프로젝트 규칙은 그대로 복사하지 말고 placeholder 또는 context pack 템플릿으로 일반화한다.
+11. JPA Entity 스킬이면 관계 어노테이션보다 scalar FK를 우선하고, 다대다는 `@ManyToMany` 대신 연결 엔티티를 쓰는 기준을 포함한다.
+12. 객체지향 디자인 패턴 기준을 포함한다: Strategy, Template Method, State, Specification/Policy, Adapter/Port, Decorator, Chain/Pipeline, Factory를 문제 축과 함께 설명한다.
+13. coroutine 스킬이면 blocking 요소, dispatcher 선택, structured concurrency, bounded fan-out, thread/memory tradeoff를 포함한다.
+14. kt 파일의 여러 data class는 기본 지양하되, 같은 부모 컨텍스트의 nested command/info/result 또는 응답 wrapper + DTO 예외를 명시한다.
+15. Maum 같은 특정 프로젝트 규칙은 그대로 복사하지 말고 placeholder 또는 context pack 템플릿으로 일반화한다.
 
 ## 검증
 
@@ -45,6 +46,8 @@ argument-hint: "[스킬로 만들 백엔드 컨벤션 또는 기존 SKILL.md]"
 - 실수 방지 가드레일: 새 스킬이나 에이전트를 추가하면 routing fixture, frontmatter 검증, 문서 정책 테스트를 함께 갱신한다.
 - 특정 회사/서비스 경로, catalog, 정책은 범용 plugin에 직접 고정하지 않는다.
 - 보안/인가, 쿼리 병목, 트랜잭션 경계, 검증 명령이 빠진 개발 스킬은 불완전한 것으로 본다.
+- Entity 예시에는 `@ManyToOne`, `@OneToMany`, `@ManyToMany`, `JoinColumn` 관계 어노테이션을 기본값처럼 넣지 않는다. `userId`, `postId` 같은 scalar FK와 명시 조인/projection을 먼저 보여준다.
+- 다대다 관계는 연결 엔티티로 설명한다. 관계 어노테이션 예시는 legacy/명시 승인 예외 섹션으로 분리한다.
 - 역할 컴포넌트와 data class 파일 구성 규칙은 agent가 설계/구현/리뷰에서 사용할 수 있게 명시적으로 적는다.
 - Facade/Service 분리 기준과 Facade 의존성 제한은 agent가 architecture boundary로 리뷰할 수 있게 적는다.
 - 확장 함수 기준은 중복과 call depth를 줄이는 경우에만 적용한다. 비즈니스 정책이나 외부 의존성은 extension으로 숨기지 않는다.

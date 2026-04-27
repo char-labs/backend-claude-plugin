@@ -41,8 +41,8 @@
 - `Criteria`는 optional filter, sorting, pagination, search condition을 model해야 한다. immutable하게 유지하고 repository/query-builder behavior를 넣지 않는다.
 - `Command`는 use-case execution 전에 validate되어야 하며, persistence entity shape가 아니라 user intent를 담아야 한다.
 - `Query`는 read-side intent와 expected lookup shape를 표현해야 한다. security/ownership check는 query DTO construction 안에 숨기지 말고 use case 또는 Service에 둔다.
-- Entity, input model, command-like data class에서 domain object로 변환할 때는 관례가 다르지 않다면 `toDomain()`을 우선한다. `toDomain()`은 현재 객체의 값만 사용해 domain model을 만드는 순수 mapping이어야 한다.
-- `toDomain()`에는 repository/client 호출, authorization, transaction, lazy association traversal, 외부 clock/ID generator 호출을 넣지 않는다. 그런 책임은 Service, role component, domain factory가 소유한다.
+- Entity, input model, command-like data class에서 domain object로 변환할 때는 관례가 다르지 않다면 `toDomain()`을 우선한다. `toDomain()`은 현재 객체의 값과 `userId`, `postId`, `categoryId` 같은 scalar FK만 사용해 domain model을 만드는 순수 mapping이어야 한다.
+- `toDomain()`에는 repository/client 호출, authorization, transaction, lazy association traversal, 관계 어노테이션 탐색, 외부 clock/ID generator 호출을 넣지 않는다. 그런 책임은 Service, role component, domain factory가 소유한다.
 - 새 domain object의 기본값이 명확한 경우 `id = 0`, `deletedAt = null`, `thumbnailUrl = null`처럼 domain convention을 드러내는 값은 `toDomain()`에서 세팅할 수 있다. 다만 invariant 검증이나 생성 정책이 복잡하면 `Domain.create(command)` 또는 factory로 이동한다.
 - `../Pida-Server`, `../Sseudam-Server` 같은 sibling example repository에 접근할 수 있으면 새 local convention을 도입하기 전에 대표 `*Command`, `*Query`, `*Criteria`, `*Result`, companion factory example을 읽는다.
 
@@ -116,6 +116,12 @@ data class NewFlowerEvent(
 
 ## JPA와 Hibernate
 
+- 신규 Entity는 객체 참조 관계보다 scalar FK 필드를 우선한다. 예: `PostEntity(val userId: Long, ...)`, `CommentEntity(val postId: Long, val userId: Long, ...)`.
+- 조회 조합은 `@ManyToOne`, `@OneToMany`, `@ManyToMany` 관계 어노테이션 탐색이 아니라 Repository, QueryDSL, SQL, JPQL의 명시 조인, projection, `*Result` mapping으로 구성한다.
+- `@OneToMany` collection field는 신규 코드에서 기본 금지한다. `findByPostId`, pagination query, projection, explicit count/read model로 대체한다.
+- `@ManyToOne`은 legacy 호환, 기존 aggregate lifecycle, 명시 승인된 예외가 있을 때만 허용한다. 사용 시 lazy loading, serializer exposure, cascade, transaction 경계, test fixture 비용을 함께 검증한다.
+- `@ManyToMany`는 신규 코드에서 사용하지 않는다. `PostTagEntity(postId, tagId)` 같은 연결 엔티티를 만들고 각 side는 scalar FK로 참조한다.
+- `JoinColumn`, cascade, orphanRemoval, bidirectional mapping은 기본 구현 수단이 아니라 예외 설계다. 예외를 선택하면 근거, fetch 전략, serialization 차단, 삭제/수정 lifecycle, 테스트 전략을 함께 남긴다.
 - DTO mapper, JSON serialization, logging, loop에서 트리거되는 lazy loading을 검토한다.
 - fetch join, entity graph, projection, batch size를 의도적으로 사용한다. 기본값으로 전체 graph를 fetch하지 않는다.
 - 트랜잭션 경계 문제를 숨기기 위한 `open-in-view` 의존을 피한다.
@@ -139,6 +145,8 @@ data class NewFlowerEvent(
 ## 흔한 Spring/Kotlin Finding
 
 - `map`, `forEach`, resolver method, lazy collection access 내부의 repository call로 발생하는 N+1.
+- 신규 Entity에 `@ManyToOne`, `@OneToMany`, `@ManyToMany` 관계 어노테이션을 기본값처럼 추가해 scalar FK와 명시 조인 경계를 흐리는 구조.
+- `@ManyToMany`를 직접 사용해 연결 테이블의 lifecycle, audit, 권한, 삭제 정책을 숨기는 구조. 연결 엔티티로 분리해야 한다.
 - ID로 loading한 뒤 object-level authorization이 누락된 구조.
 - multi-step write use case 주변에 `@Transactional`이 누락된 구조.
 - internal message를 반환하는 catch-all exception handler.

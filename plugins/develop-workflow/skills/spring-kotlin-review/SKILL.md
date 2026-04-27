@@ -1,6 +1,6 @@
 ---
 name: spring-kotlin-review
-description: Spring Security, JPA/Hibernate 쿼리 동작, 트랜잭션 경계, Gradle 검증, Kotlin nullability, DTO/domain/entity 분리, import 스타일을 Spring/Kotlin 관점으로 집중 리뷰할 때 사용.
+description: Spring Security, JPA/Hibernate 쿼리 동작, scalar FK 기반 Entity, 관계 어노테이션 지양, 트랜잭션 경계, Gradle 검증, Kotlin nullability, DTO/domain/entity 분리, import 스타일을 Spring/Kotlin 관점으로 집중 리뷰할 때 사용.
 argument-hint: "[파일, diff, 엔드포인트, 모듈, 리뷰 범위]"
 ---
 
@@ -24,7 +24,7 @@ argument-hint: "[파일, diff, 엔드포인트, 모듈, 리뷰 범위]"
 ## 실행 절차
 
 1. Spring Security를 확인한다: route protection, method security, ownership check, CSRF/CORS behavior, overly broad `permitAll`.
-2. JPA/Hibernate를 확인한다: N+1, mapper/serializer/logging lazy loading, fetch join/entity graph/projection, bulk update, `open-in-view` reliance.
+2. JPA/Hibernate를 확인한다: 신규 Entity의 scalar FK 우선 여부, `@ManyToOne`/`@OneToMany`/`@ManyToMany`/`JoinColumn` 관계 어노테이션 남용, N+1, mapper/serializer/logging lazy loading, fetch join/entity graph/projection, bulk update, `open-in-view` reliance.
 3. transaction을 확인한다: use-case ownership, `readOnly`, write boundary, transaction 내부 remote call, event consistency.
 4. Kotlin/Java import를 확인한다: nullability contract, 불필요한 `!!`, immutable command/value object, 코드 본문/하단 영역의 inline fully qualified reference 금지, Java static member의 `import static` 사용.
 5. Kotlin 파일 구성을 확인한다: 여러 data class는 기본 지양하되 같은 부모 컨텍스트의 nested type 또는 응답 wrapper + DTO는 허용한다.
@@ -33,7 +33,7 @@ argument-hint: "[파일, diff, 엔드포인트, 모듈, 리뷰 범위]"
 8. Kotlin 확장 함수 패턴을 확인한다: 여러 class에서 반복될 순수 helper는 `common`, `support`, `util` 또는 도메인 support 패키지의 top-level extension으로 둔다.
 9. Kotlin idiom을 확인한다: scope function은 의도별로 쓰고, enum/sealed/status/type 분기는 exhaustive `when`과 `is` smart cast를 우선 고려한다.
 10. 정적 팩토리와 message type을 확인한다: 의미 있는 생성은 `from`/`of`/`create`, Service 결과는 `*Result`, 입력 목적은 `*Command`/`*Query`/`*Criteria`로 드러낸다.
-11. `toDomain()` 변환을 확인한다: Entity/input model/command-like data class의 순수 domain mapping은 `toDomain()`으로 모으고, repository/client 호출, 인가, 트랜잭션, lazy association traversal은 넣지 않는다.
+11. `toDomain()` 변환을 확인한다: Entity/input model/command-like data class의 순수 domain mapping은 현재 값과 scalar FK 기반 `toDomain()`으로 모으고, repository/client 호출, 인가, 트랜잭션, lazy association traversal, 관계 어노테이션 탐색은 넣지 않는다.
 12. 반복 분기와 생명주기 행위를 확인한다: Strategy, Template Method, State, Specification/Policy, Adapter/Port가 Spring 계층 경계를 선명하게 하는지 본다.
 13. coroutine/concurrency를 확인한다: `coroutineScope`, `supervisorScope`, `Dispatchers.IO`, blocking 요소, bounded fan-out, cancellation/timeout.
 14. Gradle validation을 확인한다: existing `./gradlew` task, scoped module test, ktlint/detekt 존재 여부, 자동 dependency 설치 금지.
@@ -49,6 +49,8 @@ argument-hint: "[파일, diff, 엔드포인트, 모듈, 리뷰 범위]"
 - 실수 방지 가드레일: Spring/Kotlin finding은 관련 Gradle 검증, slice/integration test, import/style check를 함께 연결한다.
 - Spring annotation만 보고 보안/트랜잭션이 충분하다고 가정하지 않는다.
 - Entity를 API response로 직접 노출하거나 lazy association을 serialization에 맡기지 않는다.
+- 신규 Entity의 관계 어노테이션은 finding 후보로 본다. 기본 fix는 `userId`, `postId` 같은 scalar FK와 Repository 명시 조인/projection이다.
+- `@ManyToMany`는 신규 코드에서 허용하지 않는다. 연결 엔티티로 풀고 unique/index, audit, 권한, 삭제 정책을 명시한다.
 - import style은 엄격히 적용한다. 코드 본문/하단 영역에 `com.example.Foo`처럼 직접 쓰지 말고 파일 상단 import로 올리며, Java static member는 `import static`을 사용한다.
 - data class를 여러 개 넣는 파일은 같은 API/도메인 컨텍스트인지 확인한다. 독립적으로 재사용될 수 있으면 분리한다.
 - Facade는 Service만 constructor dependency로 받는다. Repository, EntityManager, client, mapper, port가 필요하면 Service 뒤로 이동시킨다.
