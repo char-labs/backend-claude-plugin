@@ -4,26 +4,16 @@
     "name": "char-yb"
   },
   "metadata": {
-    "description": "char-labs 백엔드 품질, 보안, 성능, OOP/SOLID, Spring/Kotlin workflow plugin marketplace.",
-    "version": "1.0.0",
+    "description": "char-labs 백엔드 개발, Git 안전 워크플로우, 스킬/에이전트 작성 가이드를 제공하는 plugin marketplace.",
+    "version": "1.1.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
     {
-      "name": "backend-quality-workflow",
-      "source": "./plugins/backend-quality-workflow",
-      "description": "백엔드 아키텍처, OOP/SOLID, 성능, 보안 리뷰 workflow와 Spring/Kotlin 가이드를 제공하는 Claude Code plugin.",
-      "version": "1.0.0",
-      "author": {
-        "name": "char-yb"
-      },
-      "homepage": "https://github.com/char-labs/backend-claude-plugin"
-    },
-    {
       "name": "develop-workflow",
       "source": "./plugins/develop-workflow",
       "description": "설계, 구현, 리뷰를 통합한 백엔드 개발 workflow plugin.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "author": {
         "name": "char-yb"
       },
@@ -43,7 +33,7 @@
       "name": "workflow-guide",
       "source": "./plugins/workflow-guide",
       "description": "에이전트 설계 원칙, 룰, 스캐폴딩 가이드를 제공하는 workflow 가이드 plugin.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "author": {
         "name": "char-yb"
       },

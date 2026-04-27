@@ -5,7 +5,7 @@ argument-hint: "[커밋, 푸시, PR, 브랜치 작업]"
 disable-model-invocation: true
 ---
 
-# Git Safe Workflow
+# Git 안전 워크플로우
 
 ## 설명
 
@@ -35,9 +35,9 @@ disable-model-invocation: true
 ## 주의사항
 
 - 실수 방지 가드레일: stage 전후 상태와 diff 범위를 확인하고, 관련 없는 사용자 변경을 커밋에 섞지 않는다.
-- Do not run destructive commands such as `git reset --hard`, `git clean -fd`, or broad restore commands unless the user explicitly requests them.
-- Do not include secrets, `.env`, private keys, production credentials, or local config in commits.
-- If validation cannot run, state why and include residual risk.
+- 사용자가 명시적으로 요청하지 않는 한 `git reset --hard`, `git clean -fd`, 광범위한 restore 같은 파괴적 명령을 실행하지 않는다.
+- secret, `.env`, private key, 운영 credential, 로컬 config를 커밋에 포함하지 않는다.
+- 검증을 실행할 수 없으면 이유와 잔여 리스크를 남긴다.
 
 ## 출력
 

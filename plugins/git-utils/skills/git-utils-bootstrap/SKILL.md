@@ -4,7 +4,7 @@ description: git-utils 플러그인 초기 구조를 점검하고 안전한 Git 
 argument-hint: "[Git 자동화 범위 점검]"
 ---
 
-# Git Utils Bootstrap
+# Git 유틸리티 부트스트랩
 
 ## 설명
 
