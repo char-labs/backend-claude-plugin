@@ -23,11 +23,29 @@ claude plugin install workflow-guide@backend-claude-plugin --scope user
 
 Claude Code 세션 안에서는 slash command를 사용합니다. 아래 명령은 zsh 터미널이 아니라 Claude Code 입력창에서 실행합니다.
 
+중요: slash command는 여러 줄을 한 번에 붙여넣지 말고, **한 줄씩 실행한 뒤 완료를 기다리고 다음 줄을 실행**하세요. 여러 명령을 한 번에 붙여넣으면 `/plugin install ...` 부분이 marketplace URL 뒤에 붙어 clone URL이 깨질 수 있습니다.
+
 ```text
 /plugin marketplace add char-labs/backend-claude-plugin
+```
+
+그 다음 각 plugin을 한 줄씩 설치합니다.
+
+```text
 /plugin install develop-workflow@backend-claude-plugin
+```
+
+```text
 /plugin install git-utils@backend-claude-plugin
+```
+
+```text
 /plugin install workflow-guide@backend-claude-plugin
+```
+
+마지막으로 plugin을 다시 로드합니다.
+
+```text
 /reload-plugins
 ```
 
@@ -172,6 +190,8 @@ claude plugin install develop-workflow@backend-claude-plugin --scope user
 claude plugin install git-utils@backend-claude-plugin --scope user
 claude plugin install workflow-guide@backend-claude-plugin --scope user
 ```
+
+Claude Code 입력창에서 로컬 marketplace를 테스트할 때도 slash command는 한 줄씩 실행합니다. `marketplace add`와 `plugin install`을 한 입력에 함께 붙여넣지 마세요.
 
 ## Repository Structure
 
