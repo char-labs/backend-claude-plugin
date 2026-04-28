@@ -88,6 +88,12 @@ def main() -> None:
         "api-contract-design",
     )
     assert_route(
+        "routes API response envelope work",
+        "Create ApiResponse and RestControllerAdvice response envelope for Spring REST API",
+        "api-contract-designer",
+        "api-response-contract",
+    )
+    assert_route(
         "routes test work",
         "CallService has a bug and needs regression tests",
         "backend-test-writer",

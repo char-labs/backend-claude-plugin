@@ -191,6 +191,21 @@ def assert_jpa_scalar_fk_relation_policy() -> None:
                 fail(f"JPA scalar FK relation policy must mention {marker}: {path}")
 
 
+def assert_api_response_contract_policy() -> None:
+    required_files = [
+        ROOT / "skills" / "api-response-contract" / "SKILL.md",
+        ROOT / "references" / "api-response-patterns.md",
+        ROOT / "agents" / "api-contract-designer.md",
+        ROOT / "scripts" / "route-user-prompt.py",
+        ROOT / "tests" / "eval" / "routing" / "test-cases.json",
+    ]
+    for path in required_files:
+        text = read(path)
+        for marker in ("ApiResponse", "ErrorResponse", "RestControllerAdvice", "ResponseBodyAdvice"):
+            if marker not in text:
+                fail(f"API response contract policy must mention {marker}: {path}")
+
+
 def main() -> None:
     assert_unique_case_ids()
     assert_hook_policy()
@@ -201,6 +216,7 @@ def main() -> None:
     assert_test_minimalism_policy()
     assert_test_db_and_controller_policy()
     assert_jpa_scalar_fk_relation_policy()
+    assert_api_response_contract_policy()
     print("guardrail policy tests passed")
 
 

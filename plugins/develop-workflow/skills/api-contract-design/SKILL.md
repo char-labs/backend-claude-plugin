@@ -1,6 +1,6 @@
 ---
 name: api-contract-design
-description: GraphQL, gRPC/protobuf, REST/OpenAPI, DTO, pagination, error shape, 하위 호환성, authorization boundary를 포함한 백엔드 API 입출력 계약을 설계하거나 변경할 때 사용.
+description: GraphQL, gRPC/protobuf, REST/OpenAPI, DTO, pagination, error shape, 하위 호환성, authorization boundary를 포함한 백엔드 API 입출력 계약을 설계하거나 변경할 때 사용. ApiResponse/ErrorResponse 공통 응답 envelope은 api-response-contract를 우선 사용.
 argument-hint: "[API 계약 설계 작업]"
 ---
 
@@ -15,6 +15,7 @@ argument-hint: "[API 계약 설계 작업]"
 아래 자료는 필요한 경우에만, 나열된 순서로 읽는다.
 
 - `${CLAUDE_PLUGIN_ROOT}/references/api-protocols.md`
+- ApiResponse/ErrorResponse 공통 응답 envelope이면 `api-response-contract` skill 기준을 우선 적용한다.
 - `${CLAUDE_PLUGIN_ROOT}/references/security-checklist.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/performance-checklist.md`
 - Spring/Kotlin API면 `${CLAUDE_PLUGIN_ROOT}/references/spring-kotlin-backend.md`
@@ -22,7 +23,7 @@ argument-hint: "[API 계약 설계 작업]"
 ## 실행 절차
 
 1. 기존 API naming, nullability, pagination, error, authorization 패턴을 확인한다.
-2. 요청/응답 shape, validation, authorization, mapping, error translation의 소유 계층을 정한다.
+2. 요청/응답 shape, validation, authorization, mapping, error translation의 소유 계층을 정한다. 공통 REST response envelope이 핵심이면 `api-response-contract`로 전환한다.
 3. GraphQL이면 schema field, input/output type, resolver ownership, DataLoader/batching, N+1 위험을 포함한다.
 4. gRPC/protobuf이면 field number 재사용 금지, reserved 처리, additive 변경, error semantics를 확인한다.
 5. contract, authorization, invalid input, compatibility 테스트를 정의한다.

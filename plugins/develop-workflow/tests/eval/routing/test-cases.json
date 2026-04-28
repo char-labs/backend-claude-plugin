@@ -21,6 +21,13 @@
     "expected_skill": "api-contract-design"
   },
   {
+    "id": "D07",
+    "type": "direct",
+    "prompt": "Create an ApiResponse and RestControllerAdvice response envelope for a Spring REST API",
+    "expected_agent": "api-contract-designer",
+    "expected_skill": "api-response-contract"
+  },
+  {
     "id": "D04",
     "type": "direct",
     "prompt": "CallService has a bug and needs regression tests",
@@ -159,6 +166,20 @@
     "prompt": "@ManyToMany 대신 연결 엔티티로 설계해줘",
     "expected_agent": "persistence-query-specialist",
     "expected_skill": "persistence-query-review"
+  },
+  {
+    "id": "K13",
+    "type": "korean",
+    "prompt": "Pida처럼 ApiResponse와 ErrorResponse 공통 응답 포맷을 만들고 RestControllerAdvice로 감싸줘",
+    "expected_agent": "api-contract-designer",
+    "expected_skill": "api-response-contract"
+  },
+  {
+    "id": "K14",
+    "type": "korean",
+    "prompt": "ResponseBodyAdvice로 성공 응답을 감싸고 예외 응답은 ExceptionHandler에서 처리하게 설계해줘",
+    "expected_agent": "api-contract-designer",
+    "expected_skill": "api-response-contract"
   },
   {
     "id": "C01",
