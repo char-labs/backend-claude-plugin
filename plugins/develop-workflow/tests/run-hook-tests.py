@@ -74,10 +74,21 @@ def main() -> None:
         {"tool_name": "Write", "tool_input": {"file_path": "src/main/kotlin/com/example/entity/PostEntity.kt"}},
         "scalar FK",
     )
+    assert_advisory_contains(
+        "emits repository port adapter advisory",
+        {"tool_name": "Write", "tool_input": {"file_path": "src/main/kotlin/com/example/repository/UserCoreRepository.kt"}},
+        "*CoreRepository",
+    )
     assert_advisory("emits stop advisory", {"hook_event_name": "Stop"}, "stop")
     assert_route(
         "routes query work",
         "UserRepository findByNickname query is slow and may have N+1",
+        "persistence-query-specialist",
+        "persistence-query-review",
+    )
+    assert_route(
+        "routes repository port adapter work",
+        "UserRepository는 인터페이스로 두고 UserCoreRepository가 구현하게 해줘",
         "persistence-query-specialist",
         "persistence-query-review",
     )

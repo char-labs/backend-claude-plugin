@@ -44,7 +44,7 @@
 - Entity, input model, command-like data class에서 domain object로 변환할 때는 관례가 다르지 않다면 `toDomain()`을 우선한다. `toDomain()`은 현재 객체의 값과 `userId`, `postId`, `categoryId` 같은 scalar FK만 사용해 domain model을 만드는 순수 mapping이어야 한다.
 - `toDomain()`에는 repository/client 호출, authorization, transaction, lazy association traversal, 관계 어노테이션 탐색, 외부 clock/ID generator 호출을 넣지 않는다. 그런 책임은 Service, role component, domain factory가 소유한다.
 - 새 domain object의 기본값이 명확한 경우 `id = 0`, `deletedAt = null`, `thumbnailUrl = null`처럼 domain convention을 드러내는 값은 `toDomain()`에서 세팅할 수 있다. 다만 invariant 검증이나 생성 정책이 복잡하면 `Domain.create(command)` 또는 factory로 이동한다.
-- `../Pida-Server`, `../Sseudam-Server` 같은 sibling example repository에 접근할 수 있으면 새 local convention을 도입하기 전에 대표 `*Command`, `*Query`, `*Criteria`, `*Result`, companion factory example을 읽는다.
+- `../Pida-Server`, `../Sseudam-Server` 같은 sibling example repository에 접근할 수 있으면 새 local convention을 도입하기 전에 대표 `*Command`, `*Query`, `*Criteria`, `*Result`, companion factory, `*Repository` 포트와 `*CoreRepository` 구현체 example을 읽는다.
 
 ```kotlin
 package com.pida.flowerevent
@@ -86,6 +86,9 @@ data class NewFlowerEvent(
 - Controller는 얇게 유지한다: request validation, auth context extraction, use-case call, response mapping.
 - Service/use case는 transaction과 orchestration을 소유한다.
 - Repository는 persistence access만 소유한다. repository code에 authorization이나 workflow state machine을 넣지 않는다.
+- `*Repository`는 추상화된 도메인/application 포트 인터페이스로 둔다. Service/use case는 이 포트에 의존하고 `*CoreRepository`, `*JpaRepository`, `EntityManager`, QueryDSL factory를 직접 주입받지 않는다.
+- `*CoreRepository`는 `*Repository`를 상속/구현한 infrastructure adapter다. 내부에서 `*JpaRepository`, `*CustomRepository`, QueryDSL, Redis/client adapter를 조합하고 Entity/domain/result mapping을 담당한다.
+- `*JpaRepository`는 Spring Data 구현 세부사항이므로 infrastructure package 밖으로 노출하지 않는다. 포트 interface가 `JpaRepository`를 상속하거나 Spring Data type을 반환하면 경계 누수로 본다.
 - Configuration class에는 business logic을 넣지 않는다.
 - non-trivial business action을 큰 service 내부의 private method에 묻지 않는다. `UserCreator`, `PostDeleter`, `NotificationSender`, `FlowerSpotReader`처럼 role-oriented name을 가진 응집도 높은 component로 추출한다.
 - `private`는 local detail에만 사용한다. 작은 pure helper, invariant-preserving transformation, named collaborator로 의미가 없는 code가 대상이다.
@@ -129,6 +132,7 @@ data class NewFlowerEvent(
 - remote call이나 event publishing을 감싸는 긴 transaction을 피한다.
 - native query와 JPQL은 parameter를 bind해야 한다. dynamic identifier에는 allowlist가 필요하다.
 - bulk update에서는 persistence context staleness와 domain event consistency를 고려한다.
+- QueryDSL/Native Query/CustomRepository가 필요해도 caller에게 직접 새지 않게 `*CoreRepository : *Repository` 뒤에 둔다. Service에는 `*Query`, `*Criteria`, `*Result` 중심의 도메인 의도만 노출한다.
 
 ## Gradle과 검증
 
@@ -147,6 +151,8 @@ data class NewFlowerEvent(
 - `map`, `forEach`, resolver method, lazy collection access 내부의 repository call로 발생하는 N+1.
 - 신규 Entity에 `@ManyToOne`, `@OneToMany`, `@ManyToMany` 관계 어노테이션을 기본값처럼 추가해 scalar FK와 명시 조인 경계를 흐리는 구조.
 - `@ManyToMany`를 직접 사용해 연결 테이블의 lifecycle, audit, 권한, 삭제 정책을 숨기는 구조. 연결 엔티티로 분리해야 한다.
+- `*Repository`가 Spring Data `JpaRepository`를 직접 상속하거나 `*CoreRepository` 없이 persistence detail을 Service/use case에 노출하는 구조.
+- Service/use case/Facade가 `*JpaRepository`, `*CoreRepository`, `EntityManager`, QueryDSL factory를 직접 주입받는 구조. `*Repository` 포트 뒤로 이동해야 한다.
 - ID로 loading한 뒤 object-level authorization이 누락된 구조.
 - multi-step write use case 주변에 `@Transactional`이 누락된 구조.
 - internal message를 반환하는 catch-all exception handler.

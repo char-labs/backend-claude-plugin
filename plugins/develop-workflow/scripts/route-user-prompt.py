@@ -24,7 +24,7 @@ class Route:
 
 ROUTES: list[Route] = [
     Route("security", "security-reviewer", "security-review", "인증/인가, 접근 제어, 객체 권한, 인젝션, SSRF, 시크릿, 토큰, CORS/CSRF, 레이트 리밋, 민감정보 로깅 등 보안 위험"),
-    Route("query", "persistence-query-specialist", "persistence-query-review", "Repository, SQL/JPQL/QueryDSL, JPA fetch, scalar FK, 관계 어노테이션 지양, 연결 엔티티, N+1, 인덱스, 페이지네이션, 데이터 접근 권한 등 영속성/쿼리 작업"),
+    Route("query", "persistence-query-specialist", "persistence-query-review", "`*Repository` 포트, `*CoreRepository` 구현체, `*JpaRepository` 분리, SQL/JPQL/QueryDSL, JPA fetch, scalar FK, 관계 어노테이션 지양, 연결 엔티티, N+1, 인덱스, 페이지네이션, 데이터 접근 권한 등 영속성/쿼리 작업"),
     Route("api-response", "api-contract-designer", "api-response-contract", "Spring/Kotlin REST 공통 응답 envelope, ApiResponse, ErrorResponse, ResponseBodyAdvice, RestControllerAdvice, ExceptionHandler, ResponseEntityExceptionHandler, controller 반환 DTO, RestDocs 응답 필드 정책"),
     Route("api-contract", "api-contract-designer", "api-contract-design", "GraphQL, gRPC/protobuf, REST/OpenAPI, 요청/응답 DTO, 스키마, 하위 호환성 등 API 계약 설계"),
     Route("test", "backend-test-writer", "backend-test-strategy", "단위/통합/회귀/엣지 케이스/TDD/인가 경계 테스트 작성 또는 보강"),
@@ -33,7 +33,7 @@ ROUTES: list[Route] = [
     Route("concurrency", "coroutine-concurrency-specialist", "spring-coroutine-concurrency", "Spring Boot + Kotlin coroutine, suspend, coroutineScope/supervisorScope, Dispatchers.IO, blocking IO, 경량 스레드, cancellation/timeout, thread/memory tradeoff"),
     Route("performance", "performance-reviewer", "performance-review", "응답 시간, 처리량, 캐시, 타임아웃, 재시도, 락, 메모리, 커넥션풀, 시스템 병목"),
     Route("review", "backend-reviewer", "review", "PR, diff, 코드리뷰, 감사, 머지 전 검토, 품질 게이트, 전반적 백엔드 리뷰"),
-    Route("design", "backend-architect", "design", "백엔드 아키텍처, 서비스 경계, 도메인 모델, 트랜잭션, 권한 소유, 계층 설계"),
+    Route("design", "backend-architect", "design", "백엔드 아키텍처, 서비스 경계, 도메인 모델, Repository 포트/CoreRepository 어댑터, 트랜잭션, 권한 소유, 계층 설계"),
     Route("implement", "backend-coder", "implement", "더 적합한 전문 에이전트가 없고 실제 백엔드 코드 구현/수정이 필요한 작업"),
 ]
 
@@ -51,7 +51,7 @@ NON_BACKEND_PATTERNS = [
 CATEGORY_PATTERNS: list[tuple[str, list[str]]] = [
     ("security", [r"\bsecurity\b", r"\bauth(orization|entication)?\b", r"\bcsrf\b", r"\bcors\b", r"\bssrf\b", r"\binjection\b", r"\bsecret\b", r"\btoken\b", r"\bjwt\b", r"\bcredential\b", r"\bpermission\b", r"\bprivilege\b", r"\bforbidden\b", r"\bunauthorized\b", r"\banother account\b", r"\banother user's data\b", r"\bcannot read another\b", r"보안|취약점?|취약|인증|인가|권한|접근\s*제어|객체\s*권한|권한\s*상승|권한\s*우회|토큰|JWT|쿠키|세션|CSRF|CORS|SSRF|인젝션|SQL\s*인젝션|시크릿|비밀키|자격\s*증명|개인정보|민감정보|민감\s*데이터|로깅|암호화|해시|레이트\s*리밋|속도\s*제한|탈취|우회|다른\s*계정|다른\s*사용자"]),
     ("migration", [r"\bmigrat(e|ion)\b", r"\bbackfill\b", r"\brollout\b", r"\brollback\b", r"\bstrangler\b", r"\bblue[- ]green\b", r"\bdynamodb\b", r"\bstorage\b", r"마이그레이션|전환|이관|백필|backfill|롤아웃|롤백|블루\s*그린|스트랭글러|DynamoDB|스토리지\s*전환|DB\s*전환|스키마\s*변경|데이터\s*이동|무중단"]),
-    ("query", [r"\brepository\b", r"\bquerydsl\b", r"\bjpql\b", r"\bsql\b", r"\bjpa\b", r"\bhibernate\b", r"\bn\+1\b", r"\bindex\b", r"\bfetch join\b", r"\bpagination\b", r"\bfindall\b", r"\bmanytoone\b", r"\bonetomany\b", r"\bmanytomany\b", r"\bjoincolumn\b", r"\bscalar fk\b", r"\bforeign key\b", r"쿼리|레포지토리|리포지토리|저장소|영속성|JPA|하이버네이트|QueryDSL|JPQL|\bSQL\b|N\+1|페치\s*조인|fetch\s*join|인덱스|페이지네이션|페이징|정렬|필터|카운트|count|findAll|조회\s*(쿼리|성능|최적화)?|DB\s*(조회|부하|쿼리)|ManyToOne|OneToMany|ManyToMany|JoinColumn|관계\s*어노테이션|외래키|스칼라\s*FK|scalar\s*FK|FK\s*기반|명시\s*조인|연결\s*엔티티"]),
+    ("query", [r"\brepository\b", r"\bcore\s*repository\b", r"\bcorerepository\b", r"\bjpa\s*repository\b", r"\bjparepository\b", r"\bcustom\s*repository\b", r"\bcustomrepository\b", r"\brepository\s*port\b", r"\bquerydsl\b", r"\bjpql\b", r"\bsql\b", r"\bjpa\b", r"\bhibernate\b", r"\bn\+1\b", r"\bindex\b", r"\bfetch join\b", r"\bpagination\b", r"\bfindall\b", r"\bmanytoone\b", r"\bonetomany\b", r"\bmanytomany\b", r"\bjoincolumn\b", r"\bscalar fk\b", r"\bforeign key\b", r"쿼리|레포지토리|리포지토리|저장소|영속성|Repository\s*포트|레포지토리\s*포트|리포지토리\s*포트|저장소\s*포트|Repository\s*추상화|레포지토리\s*추상화|CoreRepository|코어\s*레포지토리|JpaRepository|JPARepository|CustomRepository|JPA\s*Repository\s*분리|JPA\s*리포지토리\s*분리|JPA|하이버네이트|QueryDSL|JPQL|\bSQL\b|N\+1|페치\s*조인|fetch\s*join|인덱스|페이지네이션|페이징|정렬|필터|카운트|count|findAll|조회\s*(쿼리|성능|최적화)?|DB\s*(조회|부하|쿼리)|ManyToOne|OneToMany|ManyToMany|JoinColumn|관계\s*어노테이션|외래키|스칼라\s*FK|scalar\s*FK|FK\s*기반|명시\s*조인|연결\s*엔티티"]),
     ("concurrency", [r"\bcoroutine(s)?\b", r"\bsuspend\b", r"\bdispatchers?\.io\b", r"\bcoroutinescope\b", r"\bsupervisorscope\b", r"\basync\b", r"\bawait(all)?\b", r"\brunblocking\b", r"\bkotlin\s+flow\b", r"\bflowof\b", r"\bflow\s*[<{]", r"\bstructured concurrency\b", r"\bnon[- ]blocking\b", r"\bblocking io\b", r"코루틴|Coroutine|coroutineScope|supervisorScope|Dispatchers\.IO|런블로킹|runBlocking|비동기|동시성|경량\s*스레드|블로킹\s*IO|논블로킹|suspend|서스펜드|async|await|코틀린\s*Flow|structured\s*concurrency"]),
     ("performance", [r"\bperformance\b", r"\blatency\b", r"\bslow\b", r"\btimeout\b", r"\bretry\b", r"\bcache\b", r"\bredis\b", r"\bmemory\b", r"\block\b", r"\bthroughput\b", r"\btps\b", r"\bconnection pool\b", r"\bhikari\b", r"성능|응답\s*시간|응답이\s*\d+\s*초|지연|느림|느려|병목|처리량|TPS|캐시|Redis|타임아웃|재시도|락|락\s*경합|메모리|스레드|커넥션\s*풀|Hikari|부하|최적화|장애\s*전파"]),
     ("test", [r"\btest\b", r"\bjunit\b", r"\bmockito\b", r"\bmockk\b", r"\btdd\b", r"\bcoverage\b", r"\bregression\b", r"테스트|단위\s*테스트|유닛\s*테스트|통합\s*테스트|회귀\s*테스트|회귀|엣지|경계값|JUnit|Mockito|MockK|TDD|커버리지|테스트\s*커버|검증\s*케이스|실패\s*케이스"]),
@@ -67,7 +67,7 @@ BACKEND_HINTS = [
     r"\bbackend\b", r"\bspring\b", r"\bkotlin\b", r"\bjava\b", r"\bservice\b",
     r"\bcontroller\b", r"\buse case\b", r"\bdatabase\b", r"\bmysql\b",
     r"\bpostgres\b", r"\bredis\b", r"\bkafka\b", r"\bapi\b", r"\bgraphql\b",
-    r"\bgrpc\b", r"\bjpa\b", r"\brepository\b", r"\btransaction\b", r"\bcoroutine\b", r"\bsuspend\b",
+    r"\bgrpc\b", r"\bjpa\b", r"\brepository\b", r"\bcorerepository\b", r"\bjparepository\b", r"\btransaction\b", r"\bcoroutine\b", r"\bsuspend\b",
     r"백엔드|서버|서버사이드|스프링|코틀린|자바|서비스|컨트롤러|유스케이스|데이터베이스|DB|레포지토리|리포지토리|트랜잭션|도메인|엔티티|JPA|QueryDSL|GraphQL|gRPC|API",
 ]
 

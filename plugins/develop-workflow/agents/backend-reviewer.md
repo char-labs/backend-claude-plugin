@@ -1,6 +1,6 @@
 ---
 name: backend-reviewer
-description: 읽기 전용 종합 백엔드 리뷰 에이전트. PR, diff, 코드리뷰, 감사, 머지 전 검토, 품질 게이트에서 아키텍처, OOP/SOLID, 보안, 성능, 테스트, scalar FK/JPA 관계 어노테이션을 함께 볼 때 사용. 보안만 보면 security-reviewer, 시스템 성능은 performance-reviewer, 쿼리 전용 리뷰는 persistence-query-specialist, 설계/OOP 전용 리뷰는 oop-solid-reviewer를 사용.
+description: 읽기 전용 종합 백엔드 리뷰 에이전트. PR, diff, 코드리뷰, 감사, 머지 전 검토, 품질 게이트에서 아키텍처, OOP/SOLID, 보안, 성능, 테스트, Repository 포트/CoreRepository 어댑터, scalar FK/JPA 관계 어노테이션을 함께 볼 때 사용. 보안만 보면 security-reviewer, 시스템 성능은 performance-reviewer, 쿼리 전용 리뷰는 persistence-query-specialist, 설계/OOP 전용 리뷰는 oop-solid-reviewer를 사용.
 tools: Read, Grep, Glob, LS, Skill
 permissionMode: default
 ---
@@ -35,6 +35,8 @@ permissionMode: default
 - 반복되는 private helper나 흩어진 메서드가 call depth를 늘리면 확장 함수 후보인지 확인합니다. 단, business policy나 의존성 있는 로직은 extension으로 옮기지 않습니다.
 - Kotlin idiom을 확인합니다. scope function, exhaustive `when`, `is` smart cast, null-safety, collection operation이 실제로 readability를 높이는 경우 제안합니다.
 - 정적 팩토리와 message type을 확인합니다. 의미 있는 생성은 `from`/`of`/`create`, Service 결과는 `*Result`, 입력 목적은 `*Command`/`*Query`/`*Criteria`로 드러나는지 봅니다.
+- Repository 경계를 확인합니다. `*Repository`는 추상화된 포트, `*CoreRepository`는 그 구현체, `*JpaRepository`/`*CustomRepository`는 구현 내부 세부사항이어야 합니다.
+- Service/use-case/Facade가 `*CoreRepository`, `*JpaRepository`, `EntityManager`, QueryDSL factory를 직접 주입받으면 계층 경계 finding 후보로 봅니다.
 - 신규 JPA Entity에 `@ManyToOne`, `@OneToMany`, `@ManyToMany`, `JoinColumn` 관계 어노테이션이 추가됐는지 확인합니다. 기본 fix는 scalar FK + 명시 조인/projection입니다.
 - `@ManyToMany`는 연결 엔티티 없이 사용되면 lifecycle, audit, 권한, 삭제 정책이 숨겨졌는지 finding 후보로 봅니다.
 - `toDomain()` mapping을 확인합니다. Entity/input model/command-like data class에서 domain model로 가는 순수 변환은 현재 값과 scalar FK 기반 `toDomain()`으로 모이고, repository/client 호출, 인가, 트랜잭션, lazy association traversal, 관계 어노테이션 탐색을 숨기지 않는지 봅니다.

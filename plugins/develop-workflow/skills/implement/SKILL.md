@@ -1,6 +1,6 @@
 ---
 name: implement
-description: OOP/SOLID 경계, 보안 기본값, 성능을 고려한 데이터 접근, scalar FK 기반 Entity, 집중 테스트를 포함해 백엔드 코드를 구현/수정할 때 사용. 쿼리 변경은 persistence-query-review, 테스트 전용은 backend-test-strategy를 우선 사용.
+description: OOP/SOLID 경계, 보안 기본값, Repository 포트/CoreRepository 어댑터, 성능을 고려한 데이터 접근, scalar FK 기반 Entity, 집중 테스트를 포함해 백엔드 코드를 구현/수정할 때 사용. 쿼리 변경은 persistence-query-review, 테스트 전용은 backend-test-strategy를 우선 사용.
 argument-hint: "[구현 작업]"
 ---
 
@@ -37,13 +37,14 @@ argument-hint: "[구현 작업]"
 11. 신규 JPA Entity는 관계 어노테이션보다 scalar FK를 우선 구현한다. 예: `PostEntity(val userId: Long, ...)`, `CommentEntity(val postId: Long, val userId: Long, ...)`.
 12. `@ManyToOne`, `@OneToMany`, `@ManyToMany`, `JoinColumn`은 legacy 호환이나 명시 승인 예외가 아니면 추가하지 않는다. 필요한 조합은 Repository/QueryDSL/JPQL/SQL 명시 조인과 projection으로 구현한다.
 13. Entity/input model/command-like data class에서 domain model로 가는 순수 변환은 `toDomain()`으로 모은다. repository/client 호출, 인가, 트랜잭션, lazy association traversal, 관계 어노테이션 탐색이 필요하면 Service나 factory로 이동한다.
-14. Service/use-case 결과는 `*Result`로 반환하고, 입력 목적은 `*Command`, `*Query`, `*Criteria`로 분리한다.
-15. 반복 조건문, provider 분기, 상태별 행위, 워크플로우 골격이 보이면 Strategy, Template Method, State, Specification/Policy, Adapter/Port, Decorator, Chain/Pipeline, Factory 중 가장 단순한 패턴을 적용한다.
-16. coroutine을 쓰면 blocking 구간은 `withContext(Dispatchers.IO)`로 좁게 격리하고, `coroutineScope`/`supervisorScope`/bounded `async`를 목적에 맞게 사용한다.
-17. Kotlin/Java에서는 코드 본문이나 하단 영역에 `com.example.Foo` 같은 fully qualified reference를 직접 쓰지 않는다. 클래스/enum/object/top-level function은 파일 상단 import로 올리고, Java static member는 `import static`을 사용한다.
-18. kt 파일의 여러 data class는 기본 지양한다. 같은 부모 컨텍스트의 nested command/info/result 또는 응답 wrapper + DTO처럼 강하게 결합된 경우에만 허용한다.
-19. changed behavior와 주요 failure/security edge case에 집중 테스트를 추가/수정한다.
-20. 가장 좁은 validation을 먼저 실행하고, shared contract나 infrastructure가 바뀐 경우에만 확장한다.
+14. Repository 구현은 Pida-Server식 포트/어댑터 구조를 우선한다. 도메인/application에는 `*Repository` 인터페이스를 두고, infrastructure에는 `class *CoreRepository(...) : *Repository` 구현체를 두며, `*JpaRepository`/`*CustomRepository`는 구현 내부로 숨긴다.
+15. Service/use-case 결과는 `*Result`로 반환하고, 입력 목적은 `*Command`, `*Query`, `*Criteria`로 분리한다.
+16. 반복 조건문, provider 분기, 상태별 행위, 워크플로우 골격이 보이면 Strategy, Template Method, State, Specification/Policy, Adapter/Port, Decorator, Chain/Pipeline, Factory 중 가장 단순한 패턴을 적용한다.
+17. coroutine을 쓰면 blocking 구간은 `withContext(Dispatchers.IO)`로 좁게 격리하고, `coroutineScope`/`supervisorScope`/bounded `async`를 목적에 맞게 사용한다.
+18. Kotlin/Java에서는 코드 본문이나 하단 영역에 `com.example.Foo` 같은 fully qualified reference를 직접 쓰지 않는다. 클래스/enum/object/top-level function은 파일 상단 import로 올리고, Java static member는 `import static`을 사용한다.
+19. kt 파일의 여러 data class는 기본 지양한다. 같은 부모 컨텍스트의 nested command/info/result 또는 응답 wrapper + DTO처럼 강하게 결합된 경우에만 허용한다.
+20. changed behavior와 주요 failure/security edge case에 집중 테스트를 추가/수정한다.
+21. 가장 좁은 validation을 먼저 실행하고, shared contract나 infrastructure가 바뀐 경우에만 확장한다.
 
 ## 검증
 
@@ -57,6 +58,8 @@ argument-hint: "[구현 작업]"
 - 관련 없는 리팩터와 metadata churn을 피한다.
 - 보안 검증이나 authorization boundary를 테스트 없이 신뢰하지 않는다.
 - 쿼리 변경은 result cardinality, pagination, N+1, index 영향을 함께 확인한다.
+- Service/use-case/Facade에 `*JpaRepository`, `*CoreRepository`, `EntityManager`, QueryDSL factory를 직접 주입하지 않는다. `*Repository` 포트 뒤에 둔다.
+- `*Repository` 인터페이스는 Spring Data `JpaRepository`를 상속하지 않는다. Spring Data interface는 `*JpaRepository`로 infrastructure 내부에 두고 `*CoreRepository`가 위임한다.
 - 신규 Entity에 `@ManyToOne`, `@OneToMany`, `@ManyToMany`를 추가하지 않는다. scalar FK + 명시 조인/projection이 기본값이다.
 - 다대다 관계는 `@ManyToMany` 대신 연결 엔티티를 구현한다. 연결 엔티티에는 양쪽 FK, unique/index, audit/delete policy를 드러낸다.
 - `private`는 외부 협력자가 될 수 없는 작은 로컬 세부 구현에만 사용한다. 역할 이름이 붙는 행동이면 컴포넌트로 추출한다.

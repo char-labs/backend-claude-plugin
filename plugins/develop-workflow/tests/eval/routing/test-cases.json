@@ -182,6 +182,20 @@
     "expected_skill": "api-response-contract"
   },
   {
+    "id": "K15",
+    "type": "korean",
+    "prompt": "*Repository는 인터페이스로 두고 *CoreRepository가 구현하게 해줘",
+    "expected_agent": "persistence-query-specialist",
+    "expected_skill": "persistence-query-review"
+  },
+  {
+    "id": "K16",
+    "type": "korean",
+    "prompt": "*JpaRepository를 서비스에 직접 주입하지 말고 *CoreRepository 뒤로 숨겨줘",
+    "expected_agent": "persistence-query-specialist",
+    "expected_skill": "persistence-query-review"
+  },
+  {
     "id": "C01",
     "type": "direct",
     "prompt": "Review this Spring Kotlin coroutineScope code and check Dispatchers.IO for blocking calls",

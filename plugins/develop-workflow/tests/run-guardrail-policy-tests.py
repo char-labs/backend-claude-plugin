@@ -191,6 +191,35 @@ def assert_jpa_scalar_fk_relation_policy() -> None:
                 fail(f"JPA scalar FK relation policy must mention {marker}: {path}")
 
 
+def assert_repository_port_core_adapter_policy() -> None:
+    workflow_guide = ROOT.parent / "workflow-guide"
+    required_files = [
+        ROOT / "references" / "architecture-principles.md",
+        ROOT / "references" / "persistence-query-patterns.md",
+        ROOT / "references" / "spring-kotlin-backend.md",
+        ROOT / "skills" / "design" / "SKILL.md",
+        ROOT / "skills" / "implement" / "SKILL.md",
+        ROOT / "skills" / "persistence-query-review" / "SKILL.md",
+        ROOT / "skills" / "spring-kotlin-review" / "SKILL.md",
+        ROOT / "skills" / "review" / "SKILL.md",
+        ROOT / "agents" / "backend-architect.md",
+        ROOT / "agents" / "backend-coder.md",
+        ROOT / "agents" / "backend-reviewer.md",
+        ROOT / "agents" / "persistence-query-specialist.md",
+        ROOT / "agents" / "oop-solid-reviewer.md",
+        ROOT / "scripts" / "route-user-prompt.py",
+        ROOT / "scripts" / "advisory-feedback.py",
+        ROOT / "tests" / "eval" / "routing" / "test-cases.json",
+        workflow_guide / "references" / "backend-skill-authoring-patterns.md",
+        workflow_guide / "templates" / "backend-domain-skill-template.md",
+    ]
+    for path in required_files:
+        text = read(path)
+        for marker in ("*Repository", "*CoreRepository", "*JpaRepository"):
+            if marker not in text:
+                fail(f"Repository port/CoreRepository policy must mention {marker}: {path}")
+
+
 def assert_api_response_contract_policy() -> None:
     required_files = [
         ROOT / "skills" / "api-response-contract" / "SKILL.md",
@@ -216,6 +245,7 @@ def main() -> None:
     assert_test_minimalism_policy()
     assert_test_db_and_controller_policy()
     assert_jpa_scalar_fk_relation_policy()
+    assert_repository_port_core_adapter_policy()
     assert_api_response_contract_policy()
     print("guardrail policy tests passed")
 

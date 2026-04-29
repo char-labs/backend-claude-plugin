@@ -34,19 +34,24 @@ argument-hint: "[{작업 대상}]"
 8. 생성 의도나 invariant가 있는 객체는 companion object 정적 팩토리(`from`, `of`, `create`)를 우선한다.
 9. 신규 JPA Entity는 관계 어노테이션보다 `userId`, `postId` 같은 scalar FK를 우선한다.
 10. 다대다는 `@ManyToMany` 대신 연결 엔티티로 풀고 명시 조인/projection으로 조회한다.
-11. Entity/input model/command-like data class에서 domain model로 가는 순수 변환은 `toDomain()`으로 모은다.
-12. Service/use-case 결과는 `*Result`, 입력 목적은 `*Command`, `*Query`, `*Criteria`로 분리한다.
-13. 반복 분기, provider 선택, 상태별 행위, 워크플로우 골격이 있으면 Strategy, Template Method, State, Specification/Policy, Adapter/Port, Chain/Pipeline 등 필요한 디자인 패턴을 검토한다.
-14. coroutine/concurrency가 있으면 blocking 요소, dispatcher, structured concurrency, bounded fan-out, thread/memory tradeoff를 확인한다.
-15. 프로젝트 컨벤션에 맞게 구현 또는 설계를 작성한다.
-16. 집중 테스트와 최소 검증 명령을 수행한다.
+11. Repository는 `*Repository` 도메인 포트와 `*CoreRepository : *Repository` infrastructure 구현체로 나눈다.
+12. `*JpaRepository`/`*CustomRepository`/QueryDSL은 `*CoreRepository` 내부 위임으로 숨긴다.
+13. Entity/input model/command-like data class에서 domain model로 가는 순수 변환은 `toDomain()`으로 모은다.
+14. Service/use-case 결과는 `*Result`, 입력 목적은 `*Command`, `*Query`, `*Criteria`로 분리한다.
+15. 반복 분기, provider 선택, 상태별 행위, 워크플로우 골격이 있으면 Strategy, Template Method, State, Specification/Policy, Adapter/Port, Chain/Pipeline 등 필요한 디자인 패턴을 검토한다.
+16. coroutine/concurrency가 있으면 blocking 요소, dispatcher, structured concurrency, bounded fan-out, thread/memory tradeoff를 확인한다.
+17. 프로젝트 컨벤션에 맞게 구현 또는 설계를 작성한다.
+18. 집중 테스트와 최소 검증 명령을 수행한다.
 
 ## 위치/명명 규칙
 
 | 대상 | 위치 | 이름 규칙 |
 |---|---|---|
 | 엔티티 | `{module}/src/main/kotlin/.../entity/` | `{Domain}Entity` |
-| 리포지토리 | `{module}/src/main/kotlin/.../repository/` | `{Domain}Repository` |
+| 리포지토리 포트 | `{domain-module}/src/main/kotlin/.../{domain}/` 또는 application port package | `{Domain}Repository` |
+| Core 리포지토리 구현체 | `{infra-module}/src/main/kotlin/.../repository/` 또는 storage adapter package | `{Domain}CoreRepository : {Domain}Repository` |
+| Spring Data 리포지토리 | `{infra-module}/src/main/kotlin/.../repository/` | `{Domain}JpaRepository` |
+| QueryDSL/Custom 리포지토리 | `{infra-module}/src/main/kotlin/.../repository/` | `{Domain}CustomRepository` |
 | 서비스/유스케이스 | `{module}/src/main/kotlin/.../service/` | `{Domain}Service` |
 | 파사드 | `{module}/src/main/kotlin/.../facade/` | `{Flow}Facade` 또는 `{Domain}Facade` |
 | 역할 컴포넌트 | `{module}/src/main/kotlin/.../{domain}/` | `{Domain}{Actioner}` 예: `UserCreator`, `PostDeleter` |
@@ -71,6 +76,8 @@ argument-hint: "[{작업 대상}]"
 - `private`는 정말 내부적인 작은 세부 구현에만 사용한다. 이름 붙일 수 있는 비즈니스 행동은 역할 컴포넌트로 추출한다.
 - Facade는 여러 Service를 조합하는 계층으로만 사용한다. Facade에는 Service만 주입하고 Repository, EntityManager, client, mapper, port를 직접 주입하지 않는다.
 - 단일 도메인 책임은 Facade가 아니라 Service에 둔다.
+- Service/use-case는 `*Repository` 포트에만 의존한다. `*CoreRepository`, `*JpaRepository`, `EntityManager`, QueryDSL factory를 직접 주입하지 않는다.
+- `*Repository`는 Spring Data `JpaRepository`를 상속하지 않는다. `*CoreRepository`가 `*Repository`를 구현하고 내부에서 `*JpaRepository`/`*CustomRepository`에 위임한다.
 - 신규 Entity에는 `@ManyToOne`, `@OneToMany`, `@ManyToMany`, `JoinColumn` 관계 어노테이션을 기본값처럼 넣지 않는다. scalar FK + Repository/QueryDSL 명시 조인/projection을 우선한다.
 - 다대다는 `@ManyToMany` 대신 연결 엔티티를 사용한다. 연결 엔티티에는 양쪽 FK, unique/index, audit/delete policy를 드러낸다.
 - 확장 함수는 여러 class에서 반복될 순수 변환/포맷팅/collection/null-safety helper에 사용한다. 의존성, IO, transaction, authorization, business policy를 숨기지 않는다.

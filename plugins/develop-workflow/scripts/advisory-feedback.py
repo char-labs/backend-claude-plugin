@@ -89,6 +89,24 @@ def entityish(path: str) -> bool:
     )
 
 
+def repositoryish(path: str) -> bool:
+    normalized = path.replace("\\", "/")
+    lowered = normalized.lower()
+    name = Path(normalized).name
+    return (
+        ("src/main/" in lowered or "/src/main/" in lowered)
+        and (
+            "/repository/" in lowered
+            or name.endswith("Repository.kt")
+            or name.endswith("Repository.java")
+            or name.endswith("CoreRepository.kt")
+            or name.endswith("CoreRepository.java")
+            or name.endswith("JpaRepository.kt")
+            or name.endswith("JpaRepository.java")
+        )
+    )
+
+
 def post_tool(data: dict) -> None:
     tool_input = data.get("tool_input", {})
     if not isinstance(tool_input, dict):
@@ -104,6 +122,11 @@ def post_tool(data: dict) -> None:
     if testish(path):
         emit(
             "Backend test 안내: 비즈니스 로직, 분기, 인가, 쿼리, 오류 처리, 회귀 위험을 증명할 때만 테스트를 작성하세요. 단순 DTO/상수/설정 변경이면 새 테스트보다 compile/static validation을 우선하세요. 실 DB와 테스트 @Transactional rollback에는 의존하지 마세요."
+        )
+        return
+    if repositoryish(path):
+        emit(
+            "Repository 안내: *Repository는 추상화된 도메인/application 포트 인터페이스로 두고, *CoreRepository가 *Repository를 구현하게 하세요. *JpaRepository/*CustomRepository/QueryDSL은 infrastructure 내부에서 *CoreRepository가 위임받고, Service/use-case에는 *Repository만 주입하세요."
         )
         return
     if entityish(path):

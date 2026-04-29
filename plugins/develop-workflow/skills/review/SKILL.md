@@ -1,6 +1,6 @@
 ---
 name: review
-description: 백엔드 코드를 architecture, SOLID/OOP, security, scalar FK/JPA 관계 어노테이션, query bottleneck, application performance, missing tests 관점으로 종합 리뷰할 때 사용. 보안/성능/쿼리/OOP/Spring-Kotlin 단일 범위는 focused review skill을 우선 사용.
+description: 백엔드 코드를 architecture, SOLID/OOP, security, Repository 포트/CoreRepository 어댑터, scalar FK/JPA 관계 어노테이션, query bottleneck, application performance, missing tests 관점으로 종합 리뷰할 때 사용. 보안/성능/쿼리/OOP/Spring-Kotlin 단일 범위는 focused review skill을 우선 사용.
 argument-hint: "[파일, diff, PR, 리뷰 범위]"
 ---
 
@@ -37,11 +37,12 @@ argument-hint: "[파일, diff, PR, 리뷰 범위]"
 9. `toDomain()` mapping을 확인한다. Entity/input model/command-like data class에서 domain model로 가는 순수 변환은 현재 값과 scalar FK 기반 `toDomain()`으로 모이고, Service 내부 constructor 호출로 반복되지 않는지 본다.
 10. 정적 팩토리와 message type을 확인한다. 의미 있는 생성은 `from`/`of`/`create`, Service 결과는 `*Result`, 입력 목적은 `*Command`/`*Query`/`*Criteria`로 드러나는지 본다.
 11. 디자인 패턴 적용 여부를 확인한다. 반복 조건문은 Strategy/State/Specification, 안정된 워크플로우는 Template Method, 외부 provider는 Adapter/Port, 순차 검증은 Chain/Pipeline 후보인지 본다.
-12. authn/authz, injection, SSRF, path traversal, secret handling, logging, crypto/token, CORS/CSRF, rate limit, supply-chain risk를 확인한다.
-13. DB bottleneck을 확인한다: 관계 어노테이션 기반 lazy loading, N+1, pagination/limit 누락, index 누락, non-sargable predicate, lock scope, batch behavior, transaction length.
-14. application bottleneck을 확인한다: blocking IO, memory pressure, unbounded aggregation, cache stampede, timeout/retry 누락, expensive hot-loop work.
-15. coroutine/concurrency를 확인한다: `Dispatchers.IO`, blocking call, unbounded `async`, `runBlocking`, cancellation, timeout, thread/memory tradeoff.
-16. business rule, authorization boundary, failure mode, query behavior를 증명하는 test가 있는지 확인한다.
+12. Repository 경계를 확인한다. `*Repository`는 추상화된 포트, `*CoreRepository`는 `*Repository` 구현체, `*JpaRepository`/`*CustomRepository`는 구현 내부 세부사항인지 본다.
+13. authn/authz, injection, SSRF, path traversal, secret handling, logging, crypto/token, CORS/CSRF, rate limit, supply-chain risk를 확인한다.
+14. DB bottleneck을 확인한다: 관계 어노테이션 기반 lazy loading, N+1, pagination/limit 누락, index 누락, non-sargable predicate, lock scope, batch behavior, transaction length.
+15. application bottleneck을 확인한다: blocking IO, memory pressure, unbounded aggregation, cache stampede, timeout/retry 누락, expensive hot-loop work.
+16. coroutine/concurrency를 확인한다: `Dispatchers.IO`, blocking call, unbounded `async`, `runBlocking`, cancellation, timeout, thread/memory tradeoff.
+17. business rule, authorization boundary, failure mode, query behavior를 증명하는 test가 있는지 확인한다.
 
 ## 검증
 
@@ -58,6 +59,8 @@ argument-hint: "[파일, diff, PR, 리뷰 범위]"
 - Kotlin idiom 제안은 가독성, 유지보수성, 재사용성이 실제로 좋아질 때만 한다. scope function 중첩으로 더 어려워지면 제안하지 않는다.
 - 정적 팩토리, `*Result`, `*Command`, `*Query`, `*Criteria`는 layer ownership과 intent를 선명하게 할 때 finding으로 제안한다. 단순 취향 수준이면 낮은 severity로 둔다.
 - `toDomain()`은 순수 mapping일 때만 권장한다. repository/client 호출, 인가, 트랜잭션, lazy association traversal, 관계 어노테이션 탐색을 포함하면 더 높은 위험으로 본다.
+- Service/use-case/Facade가 `*JpaRepository`, `*CoreRepository`, `EntityManager`, QueryDSL factory를 직접 주입받거나 `*Repository` 포트가 Spring Data `JpaRepository`를 상속하면 계층 경계 finding 후보로 본다.
+- 기본 fix는 도메인/application `*Repository` 인터페이스와 infrastructure `*CoreRepository : *Repository` 구현체로 분리하고, Spring Data `*JpaRepository`/`*CustomRepository`는 구현 내부에 숨기는 것이다.
 - 신규 Entity의 `@ManyToOne`, `@OneToMany`, `@ManyToMany`, `JoinColumn`은 style finding이 아니라 성능/직렬화/트랜잭션/테스트 결합 finding 후보로 본다. 기본 fix는 scalar FK + 명시 조인/projection이다.
 - `@ManyToMany`는 신규 코드에서 사용하지 않는다. 연결 엔티티로 풀지 않으면 lifecycle, audit, 권한, 삭제 정책이 숨겨졌는지 확인한다.
 - 디자인 패턴 finding은 중복 분기, 변경 축, 테스트 어려움, layer boundary 문제처럼 concrete impact가 있을 때만 낸다. 패턴 이름만 붙이는 제안은 피한다.

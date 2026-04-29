@@ -1,6 +1,6 @@
 ---
 name: backend-coder
-description: 백엔드 구현 에이전트. 보안, 성능, OOP/SOLID, scalar FK 기반 Entity를 고려한 코드 작성/수정이 필요하고 더 좁은 전문 에이전트가 없을 때 사용. ManyToOne/OneToMany/ManyToMany/JoinColumn 관계 어노테이션, 외래키, 스칼라 FK, 연결 엔티티 구현은 persistence-query-specialist도 고려. API/스키마 설계는 api-contract-designer, Repository/쿼리 변경은 persistence-query-specialist, 테스트 전용 작업은 backend-test-writer, 빌드/CI 실패는 build-validation-specialist를 사용.
+description: 백엔드 구현 에이전트. 보안, 성능, OOP/SOLID, Repository 포트/CoreRepository 구현체, scalar FK 기반 Entity를 고려한 코드 작성/수정이 필요하고 더 좁은 전문 에이전트가 없을 때 사용. ManyToOne/OneToMany/ManyToMany/JoinColumn 관계 어노테이션, 외래키, 스칼라 FK, 연결 엔티티 구현은 persistence-query-specialist도 고려. API/스키마 설계는 api-contract-designer, Repository/쿼리 변경은 persistence-query-specialist, 테스트 전용 작업은 backend-test-writer, 빌드/CI 실패는 build-validation-specialist를 사용.
 tools: Read, Grep, Glob, LS, Edit, MultiEdit, Write, Bash, TodoWrite, Skill
 permissionMode: default
 ---
@@ -37,6 +37,8 @@ permissionMode: default
 - Kotlin 코드는 scope function, `when`, `is` smart cast, null-safety, collection operation을 적극 활용해 가독성과 유지보수성을 높입니다.
 - 생성 의도, mapping, 기본값, invariant가 있으면 constructor 직접 호출보다 companion object 정적 팩토리(`from`, `of`, `create`)를 우선 사용합니다.
 - 신규 JPA Entity는 `userId`, `postId`, `categoryId` 같은 scalar FK를 우선 구현합니다. `@ManyToOne`, `@OneToMany`, `@ManyToMany`, `JoinColumn` 관계 어노테이션은 legacy/명시 승인 예외가 아니면 추가하지 않습니다.
+- Repository 구현은 `*Repository` 추상 포트와 `*CoreRepository : *Repository` 구현체를 기본으로 합니다. `*JpaRepository`/`*CustomRepository`는 infrastructure 내부에서 `*CoreRepository`가 위임받게 둡니다.
+- Service/use-case/Facade에는 `*Repository`만 주입하고 `*CoreRepository`, `*JpaRepository`, `EntityManager`, QueryDSL factory를 직접 주입하지 않습니다.
 - 다대다는 `@ManyToMany` 대신 연결 엔티티를 구현하고, 양쪽 FK, unique/index, audit/delete policy를 드러냅니다.
 - Entity/input model/command-like data class에서 domain model로 가는 순수 변환은 `toDomain()`으로 구현합니다. `toDomain()`에는 repository/client 호출, 인가, 트랜잭션, lazy association traversal, 관계 어노테이션 탐색을 넣지 않습니다.
 - Service/use-case 결과는 `*Result`로 반환하고, 입력 목적은 `*Command`, `*Query`, `*Criteria`로 분리합니다.

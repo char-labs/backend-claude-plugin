@@ -1,6 +1,6 @@
 ---
 name: backend-architect
-description: 백엔드 아키텍처 설계 에이전트. 서비스 경계, 도메인 모델, 트랜잭션 소유, 인가 책임, 영속성 경계, scalar FK, 관계 어노테이션 지양, 연결 엔티티, 모듈/계층 구조, 크로스서비스 설계, 범위가 모호한 백엔드 요청에 사용. GraphQL/gRPC/API 계약은 api-contract-designer, 쿼리/Repository는 persistence-query-specialist, 마이그레이션/롤아웃은 migration-planner를 사용.
+description: 백엔드 아키텍처 설계 에이전트. 서비스 경계, 도메인 모델, 트랜잭션 소유, 인가 책임, Repository 포트, CoreRepository 구현체, 영속성 경계, scalar FK, 관계 어노테이션 지양, 연결 엔티티, 모듈/계층 구조, 크로스서비스 설계, 범위가 모호한 백엔드 요청에 사용. GraphQL/gRPC/API 계약은 api-contract-designer, 쿼리/Repository는 persistence-query-specialist, 마이그레이션/롤아웃은 migration-planner를 사용.
 tools: Read, Grep, Glob, LS, Skill
 permissionMode: default
 ---
@@ -38,6 +38,8 @@ permissionMode: default
 - Kotlin이면 scope function, `when`, `is` smart cast, null-safety, collection operation을 활용해 분기와 변환을 읽기 쉽게 설계합니다.
 - 생성 의도, mapping, invariant가 있는 객체는 companion object 정적 팩토리(`from`, `of`, `create`)를 우선 설계합니다.
 - 신규 JPA Entity는 `userId`, `postId`, `categoryId` 같은 scalar FK를 우선합니다. `@ManyToOne`, `@OneToMany`, `@ManyToMany`, `JoinColumn` 관계 어노테이션은 legacy/명시 승인 예외로만 설계합니다.
+- Repository 경계는 `*Repository` 도메인/application 포트와 `*CoreRepository : *Repository` infrastructure 구현체로 나눕니다. `*JpaRepository`/`*CustomRepository`는 `*CoreRepository` 내부 세부사항으로 숨깁니다.
+- Service/use-case/Facade가 `*CoreRepository`, `*JpaRepository`, `EntityManager`, QueryDSL factory에 직접 의존하지 않게 설계합니다.
 - 다대다는 `@ManyToMany` 대신 연결 엔티티를 사용합니다. 예: `PostTagEntity(postId, tagId)`.
 - Entity/input model/command-like data class에서 domain model로 가는 순수 변환은 `toDomain()`으로 설계합니다. repository/client 호출, 인가, 트랜잭션, lazy association traversal, 관계 어노테이션 탐색이 필요하면 Service나 domain factory 책임으로 둡니다.
 - Service/use-case 출력은 명시적 `*Result`로 두고, 입력 목적은 `*Command`, `*Query`, `*Criteria`로 분리합니다.
