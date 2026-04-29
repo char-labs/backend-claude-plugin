@@ -1,6 +1,6 @@
 ---
 name: implement
-description: OOP/SOLID 경계, 보안 기본값, Repository 포트/CoreRepository 어댑터, 성능을 고려한 데이터 접근, scalar FK 기반 Entity, 집중 테스트를 포함해 백엔드 코드를 구현/수정할 때 사용. 쿼리 변경은 persistence-query-review, 테스트 전용은 backend-test-strategy를 우선 사용.
+description: OOP/SOLID 경계, 보안 기본값, JPA Entity infrastructure/db-core 위치, BaseEntity, 순수 domain data class, toDomain mapping, Repository 포트/CoreRepository 어댑터, Spring DataSourceConfig/JpaConfig/yml/Flyway 설정, 성능을 고려한 데이터 접근, scalar FK 기반 Entity, 집중 테스트를 포함해 백엔드 코드를 구현/수정할 때 사용. BaseEntity는 jpa-base-entity, persistence 설정은 spring-persistence-config, 쿼리 변경은 persistence-query-review, 테스트 전용은 backend-test-strategy를 우선 사용.
 argument-hint: "[구현 작업]"
 ---
 
@@ -20,6 +20,8 @@ argument-hint: "[구현 작업]"
 - `${CLAUDE_PLUGIN_ROOT}/references/performance-checklist.md`
 - `${CLAUDE_PLUGIN_ROOT}/references/testing-strategy.md`
 - Spring/Kotlin/JPA/Gradle이면 `${CLAUDE_PLUGIN_ROOT}/references/spring-kotlin-backend.md`
+- BaseEntity/auditing/soft delete/equality 구현이면 `jpa-base-entity` skill과 `${CLAUDE_PLUGIN_ROOT}/references/jpa-base-entity.md`
+- Spring DataSource/JPA/yml/Flyway 설정이면 `spring-persistence-config` skill과 `${CLAUDE_PLUGIN_ROOT}/references/spring-persistence-config.md`
 - Spring/Kotlin coroutine/concurrency이면 `spring-coroutine-concurrency` skill 기준을 함께 적용한다.
 
 ## 실행 절차
@@ -34,17 +36,20 @@ argument-hint: "[구현 작업]"
 8. 여러 class에서 반복될 변환, 포맷팅, collection, null-safety helper는 private method나 흩어진 메서드로 두지 않고 top-level 확장 함수로 추출한다.
 9. Kotlin에서는 scope function, `when`, `is` smart cast, null-safety, collection operation을 우선 고려해 가독성과 재사용성을 높인다.
 10. 생성 의도, mapping, 기본값, invariant가 있으면 constructor 직접 호출보다 companion object 정적 팩토리(`from`, `of`, `create`)를 우선 사용한다.
-11. 신규 JPA Entity는 관계 어노테이션보다 scalar FK를 우선 구현한다. 예: `PostEntity(val userId: Long, ...)`, `CommentEntity(val postId: Long, val userId: Long, ...)`.
-12. `@ManyToOne`, `@OneToMany`, `@ManyToMany`, `JoinColumn`은 legacy 호환이나 명시 승인 예외가 아니면 추가하지 않는다. 필요한 조합은 Repository/QueryDSL/JPQL/SQL 명시 조인과 projection으로 구현한다.
-13. Entity/input model/command-like data class에서 domain model로 가는 순수 변환은 `toDomain()`으로 모은다. repository/client 호출, 인가, 트랜잭션, lazy association traversal, 관계 어노테이션 탐색이 필요하면 Service나 factory로 이동한다.
-14. Repository 구현은 Pida-Server식 포트/어댑터 구조를 우선한다. 도메인/application에는 `*Repository` 인터페이스를 두고, infrastructure에는 `class *CoreRepository(...) : *Repository` 구현체를 두며, `*JpaRepository`/`*CustomRepository`는 구현 내부로 숨긴다.
-15. Service/use-case 결과는 `*Result`로 반환하고, 입력 목적은 `*Command`, `*Query`, `*Criteria`로 분리한다.
-16. 반복 조건문, provider 분기, 상태별 행위, 워크플로우 골격이 보이면 Strategy, Template Method, State, Specification/Policy, Adapter/Port, Decorator, Chain/Pipeline, Factory 중 가장 단순한 패턴을 적용한다.
-17. coroutine을 쓰면 blocking 구간은 `withContext(Dispatchers.IO)`로 좁게 격리하고, `coroutineScope`/`supervisorScope`/bounded `async`를 목적에 맞게 사용한다.
-18. Kotlin/Java에서는 코드 본문이나 하단 영역에 `com.example.Foo` 같은 fully qualified reference를 직접 쓰지 않는다. 클래스/enum/object/top-level function은 파일 상단 import로 올리고, Java static member는 `import static`을 사용한다.
-19. kt 파일의 여러 data class는 기본 지양한다. 같은 부모 컨텍스트의 nested command/info/result 또는 응답 wrapper + DTO처럼 강하게 결합된 경우에만 허용한다.
-20. changed behavior와 주요 failure/security edge case에 집중 테스트를 추가/수정한다.
-21. 가장 좁은 validation을 먼저 실행하고, shared contract나 infrastructure가 바뀐 경우에만 확장한다.
+11. JPA Entity는 domain이 아니라 infrastructure/db-core/persistence adapter에 구현한다. domain에는 JPA annotation이 없는 순수 data class/domain object만 둔다.
+12. BaseEntity는 infrastructure/db-core/persistence adapter의 support package에 두고, `@MappedSuperclass`, `AuditingEntityListener`, `GenerationType.IDENTITY`, `createdAt`/`updatedAt`/`deletedAt`, `softDelete`, `equals/hashCode`를 한 세트로 구현한다.
+13. DataSourceConfig, JpaConfig, yml 설정은 프로젝트 module/package/profile/prefix에 맞춘다. `HikariConfig`, `ConfigurationProperties`, `EntityScan`, `EnableJpaRepositories`, `open-in-view`, Flyway locations/baseline/validate/clean-disabled, 환경변수 placeholder를 한 세트로 확인한다.
+14. 신규 JPA Entity는 관계 어노테이션보다 scalar FK를 우선 구현한다. 예: `PostEntity(val userId: Long, ...)`, `CommentEntity(val postId: Long, val userId: Long, ...)`.
+15. `@ManyToOne`, `@OneToMany`, `@ManyToMany`, `JoinColumn`은 legacy 호환이나 명시 승인 예외가 아니면 추가하지 않는다. 필요한 조합은 Repository/QueryDSL/JPQL/SQL 명시 조인과 projection으로 구현한다.
+16. Entity/input model/command-like data class에서 domain model로 가는 순수 변환은 `toDomain()`으로 모은다. repository/client 호출, 인가, 트랜잭션, lazy association traversal, 관계 어노테이션 탐색이 필요하면 Service나 factory로 이동한다.
+17. Repository 구현은 Pida-Server식 포트/어댑터 구조를 우선한다. 도메인/application에는 `*Repository` 인터페이스를 두고, infrastructure에는 `class *CoreRepository(...) : *Repository` 구현체를 두며, `*JpaRepository`/`*CustomRepository`는 구현 내부로 숨긴다.
+18. Service/use-case 결과는 `*Result`로 반환하고, 입력 목적은 `*Command`, `*Query`, `*Criteria`로 분리한다.
+19. 반복 조건문, provider 분기, 상태별 행위, 워크플로우 골격이 보이면 Strategy, Template Method, State, Specification/Policy, Adapter/Port, Decorator, Chain/Pipeline, Factory 중 가장 단순한 패턴을 적용한다.
+20. coroutine을 쓰면 blocking 구간은 `withContext(Dispatchers.IO)`로 좁게 격리하고, `coroutineScope`/`supervisorScope`/bounded `async`를 목적에 맞게 사용한다.
+21. Kotlin/Java에서는 코드 본문이나 하단 영역에 `com.example.Foo` 같은 fully qualified reference를 직접 쓰지 않는다. 클래스/enum/object/top-level function은 파일 상단 import로 올리고, Java static member는 `import static`을 사용한다.
+22. kt 파일의 여러 data class는 기본 지양한다. 같은 부모 컨텍스트의 nested command/info/result 또는 응답 wrapper + DTO처럼 강하게 결합된 경우에만 허용한다.
+23. changed behavior와 주요 failure/security edge case에 집중 테스트를 추가/수정한다.
+24. 가장 좁은 validation을 먼저 실행하고, shared contract나 infrastructure가 바뀐 경우에만 확장한다.
 
 ## 검증
 
@@ -58,6 +63,9 @@ argument-hint: "[구현 작업]"
 - 관련 없는 리팩터와 metadata churn을 피한다.
 - 보안 검증이나 authorization boundary를 테스트 없이 신뢰하지 않는다.
 - 쿼리 변경은 result cardinality, pagination, N+1, index 영향을 함께 확인한다.
+- `@Entity`, `@Table`, `@Column`, `@Id`가 붙은 JPA Entity를 domain module/package에 만들지 않는다. Entity는 infrastructure/db-core에 두고 domain에는 순수 data class를 둔다.
+- BaseEntity는 `@MappedSuperclass`, `AuditingEntityListener`, `GenerationType.IDENTITY`, `softDelete`, id 기반 `equals/hashCode` 기준을 지킨다. `equals`가 같은 class와 같은 id에서 false가 되지 않는지 확인한다.
+- persistence 설정은 `db-core`, `db.core`, `coreDataSource` 같은 예시 이름을 그대로 복사하지 않고 프로젝트 성격에 맞춘다. yml에는 secret 실값 대신 환경변수 placeholder만 둔다.
 - Service/use-case/Facade에 `*JpaRepository`, `*CoreRepository`, `EntityManager`, QueryDSL factory를 직접 주입하지 않는다. `*Repository` 포트 뒤에 둔다.
 - `*Repository` 인터페이스는 Spring Data `JpaRepository`를 상속하지 않는다. Spring Data interface는 `*JpaRepository`로 infrastructure 내부에 두고 `*CoreRepository`가 위임한다.
 - 신규 Entity에 `@ManyToOne`, `@OneToMany`, `@ManyToMany`를 추가하지 않는다. scalar FK + 명시 조인/projection이 기본값이다.
@@ -68,7 +76,7 @@ argument-hint: "[구현 작업]"
 - scope function은 `apply`/`also`/`let`/`run`/`with`의 의도에 맞게 선택한다. 중첩 scope와 모호한 `it`은 피한다.
 - enum/sealed/status/type 분기는 가능한 exhaustive `when`과 `is` smart cast로 표현한다.
 - 정적 팩토리는 생성 의도를 드러내는 장치로 사용한다. 단순 값 전달만 하는 모든 data class constructor를 기계적으로 감싸지 않는다.
-- `toDomain()`은 순수 mapping에만 사용한다. 새 domain 기본값(`id = 0`, `deletedAt = null`)은 명확하면 허용하지만, 생성 정책이나 invariant가 복잡하면 domain factory를 우선한다.
+- `toDomain()`은 infrastructure/db-core Entity에서 domain의 순수 data class로 넘어가는 순수 mapping에만 사용한다. 새 domain 기본값(`id = 0`, `deletedAt = null`)은 명확하면 허용하지만, 생성 정책이나 invariant가 복잡하면 domain factory를 우선한다.
 - Service에서 entity, response DTO, primitive bundle, `Pair`/`Triple`을 그대로 반환하지 말고 application contract인 `*Result`를 우선 작성한다.
 - API request DTO를 그대로 Command/Query/Criteria로 재사용하기 전에 layer ownership과 validation 위치가 흐려지는지 확인한다.
 - Strategy와 Template Method를 우선 후보로 보되, inheritance보다 composition이 단순하면 composition을 선택한다.

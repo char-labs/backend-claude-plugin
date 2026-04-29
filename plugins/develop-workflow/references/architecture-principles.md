@@ -6,6 +6,7 @@
 
 - 의존성 방향을 안정적으로 유지한다. delivery adapter는 application use case에 의존하고, application은 domain port에 의존하며, infrastructure는 port를 구현한다.
 - 저장소 경계도 같은 방향을 따른다. `*Repository`는 도메인/application 포트 인터페이스이고, `*CoreRepository`는 infrastructure adapter로 `*Repository`를 구현하며, `*JpaRepository`/`*CustomRepository`는 `*CoreRepository` 내부 구현 세부사항으로 숨긴다.
+- JPA Entity는 domain model이 아니라 infrastructure/db-core/persistence adapter 소유 모델이다. domain에는 JPA annotation이나 persistence lifecycle이 없는 순수 data class 객체를 두고, Entity는 `toDomain()`으로 domain 객체로 변환해 사용한다.
 - 도메인 동작은 도메인 모델 가까이에 둔다. repository와 DTO 사이에서 데이터만 옮기는 service를 피한다.
 - codebase에 더 좁고 명확한 기존 패턴이 없다면 external DTO, persistence entity, command, query, domain model을 분리한다.
 - 트랜잭션 소유권은 application/use-case 경계에 둔다. low-level helper에서 transaction을 시작하거나 긴 database transaction 안에 remote call을 섞지 않는다.
@@ -32,10 +33,10 @@
 
 - Controller는 transport shape 검증, boundary의 authentication/authorization, 하나의 use case 호출, result mapping만 담당해야 한다.
 - Use case는 도메인 동작, transaction, repository, side effect를 조율해야 한다.
-- Domain object는 프로젝트가 의도적으로 active-record 또는 entity-domain model을 쓰는 경우가 아니라면 framework annotation을 피한다.
+- Domain object는 framework annotation, JPA lifecycle, persistence schema shape를 피한 순수 data class/domain model이어야 한다. `@Entity`, `@Table`, `@Column`, `@Id`가 붙은 JPA Entity는 domain package가 아니라 infrastructure/db-core/persistence package에 둔다.
 - Repository는 persistence-specific query shape를 넘어서는 business decision을 담지 않는다.
 - Service/use case는 `*Repository` 포트에 의존하고, `*CoreRepository`, `*JpaRepository`, `EntityManager`, QueryDSL factory 같은 구체 infrastructure 타입에 직접 의존하지 않는다.
-- `*CoreRepository`는 `*Repository`를 구현하며 Entity와 domain/result mapping, `*JpaRepository` 위임, 필요한 `*CustomRepository`/QueryDSL 조합을 소유한다. Spring Data type, `Pageable`, `EntityManager`, JPA annotation 의존이 domain 포트로 새면 boundary finding으로 본다.
+- `*CoreRepository`는 `*Repository`를 구현하며 JPA Entity와 domain/result mapping, `toDomain()` 변환, `*JpaRepository` 위임, 필요한 `*CustomRepository`/QueryDSL 조합을 소유한다. Spring Data type, `Pageable`, `EntityManager`, JPA annotation 의존이 domain 포트로 새면 boundary finding으로 본다.
 - Infrastructure adapter는 vendor SDK, SQL/JPA detail, HTTP client, serialization quirk를 격리해야 한다.
 - Application/use-case component는 이름으로 의도를 드러내야 한다. 생성, 삭제, 취소, 발급, 승인, 정산 flow가 단순 한 줄 위임보다 크다면 응집도 높은 component로 표현한다.
 - Facade는 Service만 orchestration한다. repository, entity manager, vendor client, mapper, port, low-level role component를 Facade에 직접 주입하지 말고 Service 뒤로 숨긴다.
@@ -62,6 +63,7 @@
 - `*Result`가 application contract를 명확히 만들 수 있는데 Service가 entity, response DTO, primitive, pair/triple을 반환하는지 찾는다.
 - request DTO가 Command, Query, Criteria, Result로 동시에 재사용되는지 찾는다. layer ownership과 validation clarity가 좋아지면 intent별로 분리한다.
 - `*Repository`가 Spring Data `JpaRepository`를 직접 상속하거나 Service가 `*JpaRepository`/`*CoreRepository`를 직접 주입받는 구조를 찾는다. 기본 fix는 domain `*Repository` 포트와 infrastructure `*CoreRepository : *Repository` adapter로 분리하는 것이다.
+- domain package 또는 domain module 안의 `*Entity`, `@Entity`, `@Table`, `@Column`, `@Id`를 찾는다. 기본 fix는 JPA Entity를 infrastructure/db-core로 이동하고 domain에는 순수 data class를 둔 뒤 Entity `toDomain()` 변환을 통해 사용하게 하는 것이다.
 - 같은 type/status/provider에 대한 반복 conditional을 찾는다. variation point에 따라 Strategy, State, Specification, Adapter, 또는 exhaustive `when`을 가진 sealed type을 우선한다.
 - step이 달라지는 안정된 워크플로우 골격을 찾는다. inheritance가 role component 조합보다 생명주기를 더 잘 모델링할 때만 Template Method를 고려한다.
 - 패턴 과사용을 찾는다. 안정적인 구현 하나뿐인 interface, fragile protected hook을 가진 abstract class, business side effect를 숨기는 decorator, ordering이 테스트되지 않은 pipeline을 확인한다.

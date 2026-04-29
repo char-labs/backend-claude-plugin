@@ -32,22 +32,26 @@ argument-hint: "[{작업 대상}]"
 6. 여러 class에서 반복될 순수 helper는 private method로 흩어 두지 않고 확장 함수 후보로 분리한다.
 7. Kotlin이면 scope function, `when`, `is` smart cast, null-safety, collection operation을 활용해 가독성과 재사용성을 높인다.
 8. 생성 의도나 invariant가 있는 객체는 companion object 정적 팩토리(`from`, `of`, `create`)를 우선한다.
-9. 신규 JPA Entity는 관계 어노테이션보다 `userId`, `postId` 같은 scalar FK를 우선한다.
-10. 다대다는 `@ManyToMany` 대신 연결 엔티티로 풀고 명시 조인/projection으로 조회한다.
-11. Repository는 `*Repository` 도메인 포트와 `*CoreRepository : *Repository` infrastructure 구현체로 나눈다.
-12. `*JpaRepository`/`*CustomRepository`/QueryDSL은 `*CoreRepository` 내부 위임으로 숨긴다.
-13. Entity/input model/command-like data class에서 domain model로 가는 순수 변환은 `toDomain()`으로 모은다.
-14. Service/use-case 결과는 `*Result`, 입력 목적은 `*Command`, `*Query`, `*Criteria`로 분리한다.
-15. 반복 분기, provider 선택, 상태별 행위, 워크플로우 골격이 있으면 Strategy, Template Method, State, Specification/Policy, Adapter/Port, Chain/Pipeline 등 필요한 디자인 패턴을 검토한다.
-16. coroutine/concurrency가 있으면 blocking 요소, dispatcher, structured concurrency, bounded fan-out, thread/memory tradeoff를 확인한다.
-17. 프로젝트 컨벤션에 맞게 구현 또는 설계를 작성한다.
-18. 집중 테스트와 최소 검증 명령을 수행한다.
+9. JPA Entity는 domain이 아니라 infrastructure/db-core/persistence adapter에 둔다.
+10. domain에는 JPA annotation 없는 순수 data class/domain object를 둔다.
+11. BaseEntity가 필요하면 persistence support package에 두고 `@MappedSuperclass`, `AuditingEntityListener`, `GenerationType.IDENTITY`, `softDelete`, id 기반 `equals/hashCode` 기준을 적용한다.
+12. 신규 JPA Entity는 관계 어노테이션보다 `userId`, `postId` 같은 scalar FK를 우선한다.
+13. 다대다는 `@ManyToMany` 대신 연결 엔티티로 풀고 명시 조인/projection으로 조회한다.
+14. Repository는 `*Repository` 도메인 포트와 `*CoreRepository : *Repository` infrastructure 구현체로 나눈다.
+15. `*JpaRepository`/`*CustomRepository`/QueryDSL은 `*CoreRepository` 내부 위임으로 숨긴다.
+16. Entity/input model/command-like data class에서 domain model로 가는 순수 변환은 `toDomain()`으로 모은다.
+17. Service/use-case 결과는 `*Result`, 입력 목적은 `*Command`, `*Query`, `*Criteria`로 분리한다.
+18. 반복 분기, provider 선택, 상태별 행위, 워크플로우 골격이 있으면 Strategy, Template Method, State, Specification/Policy, Adapter/Port, Chain/Pipeline 등 필요한 디자인 패턴을 검토한다.
+19. coroutine/concurrency가 있으면 blocking 요소, dispatcher, structured concurrency, bounded fan-out, thread/memory tradeoff를 확인한다.
+20. 프로젝트 컨벤션에 맞게 구현 또는 설계를 작성한다.
+21. 집중 테스트와 최소 검증 명령을 수행한다.
 
 ## 위치/명명 규칙
 
 | 대상 | 위치 | 이름 규칙 |
 |---|---|---|
-| 엔티티 | `{module}/src/main/kotlin/.../entity/` | `{Domain}Entity` |
+| JPA 엔티티 | `{infra-module}` 또는 `db-core`/`storage` adapter의 `.../entity/` | `{Domain}Entity` |
+| 도메인 모델 | `{domain-module}/src/main/kotlin/.../{domain}/` | `{Domain}` 순수 data class |
 | 리포지토리 포트 | `{domain-module}/src/main/kotlin/.../{domain}/` 또는 application port package | `{Domain}Repository` |
 | Core 리포지토리 구현체 | `{infra-module}/src/main/kotlin/.../repository/` 또는 storage adapter package | `{Domain}CoreRepository : {Domain}Repository` |
 | Spring Data 리포지토리 | `{infra-module}/src/main/kotlin/.../repository/` | `{Domain}JpaRepository` |
@@ -76,6 +80,9 @@ argument-hint: "[{작업 대상}]"
 - `private`는 정말 내부적인 작은 세부 구현에만 사용한다. 이름 붙일 수 있는 비즈니스 행동은 역할 컴포넌트로 추출한다.
 - Facade는 여러 Service를 조합하는 계층으로만 사용한다. Facade에는 Service만 주입하고 Repository, EntityManager, client, mapper, port를 직접 주입하지 않는다.
 - 단일 도메인 책임은 Facade가 아니라 Service에 둔다.
+- JPA Entity는 domain module/package에 두지 않는다. `@Entity`, `@Table`, `@Column`, `@Id`는 infrastructure/db-core Entity에만 둔다.
+- domain에는 JPA annotation 없는 순수 data class/domain object를 두고, Entity는 `toDomain()`으로 domain 객체로 변환한다.
+- BaseEntity는 domain이 아니라 persistence support package에 둔다. `equals`는 같은 class와 같은 id에서 true여야 하며, `softDelete`는 조회 필터 정책까지 함께 다룬다.
 - Service/use-case는 `*Repository` 포트에만 의존한다. `*CoreRepository`, `*JpaRepository`, `EntityManager`, QueryDSL factory를 직접 주입하지 않는다.
 - `*Repository`는 Spring Data `JpaRepository`를 상속하지 않는다. `*CoreRepository`가 `*Repository`를 구현하고 내부에서 `*JpaRepository`/`*CustomRepository`에 위임한다.
 - 신규 Entity에는 `@ManyToOne`, `@OneToMany`, `@ManyToMany`, `JoinColumn` 관계 어노테이션을 기본값처럼 넣지 않는다. scalar FK + Repository/QueryDSL 명시 조인/projection을 우선한다.
@@ -84,7 +91,7 @@ argument-hint: "[{작업 대상}]"
 - scope function은 의도별로 사용한다. `apply`는 설정, `also`는 side effect checkpoint, `let`은 nullable/변환, `run`은 계산, `with`는 receiver grouping에 쓴다.
 - `when`은 enum/sealed/status/type 분기를 표현하고, `is` smart cast로 안전한 타입 분기를 작성한다.
 - 정적 팩토리는 생성 의도, mapping, 기본값, invariant가 있는 경우 적극 사용한다. 단순 값 보관용 constructor까지 기계적으로 감싸지는 않는다.
-- `toDomain()`은 현재 객체 값만 사용하는 순수 mapping에만 사용한다. repository/client 호출, 인가, 트랜잭션, lazy association traversal, 외부 ID/clock 호출이 필요하면 Service나 factory로 이동한다.
+- `toDomain()`은 infrastructure/db-core Entity에서 domain의 순수 data class로 넘어가는 현재 객체 값만 사용하는 순수 mapping에만 사용한다. repository/client 호출, 인가, 트랜잭션, lazy association traversal, 외부 ID/clock 호출이 필요하면 Service나 factory로 이동한다.
 - Service는 entity, response DTO, primitive bundle, `Pair`/`Triple` 대신 명시적인 `*Result`를 반환하도록 작성한다.
 - `Command`, `Query`, `Criteria`, `Result`는 immutable로 두고 API request/response DTO나 persistence entity와 겸용하지 않는다.
 - 디자인 패턴은 variation point와 테스트 가능성이 있을 때만 적용한다. 단일 구현 interface, 불필요한 abstract class, 테스트되지 않은 pipeline, 숨겨진 decorator side effect를 피한다.

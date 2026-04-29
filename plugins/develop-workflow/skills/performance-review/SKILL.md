@@ -1,6 +1,6 @@
 ---
 name: performance-review
-description: 쿼리 병목, 관계 어노테이션 기반 lazy loading, N+1, pagination/index 누락, transaction/lock scope, blocking IO, memory pressure, caching, timeout, retry 등 백엔드 성능 위험을 집중 리뷰할 때 사용.
+description: 쿼리 병목, JPA Entity infrastructure/db-core 위치, toDomain mapping, 관계 어노테이션 기반 lazy loading, N+1, pagination/index 누락, transaction/lock scope, blocking IO, memory pressure, caching, timeout, retry 등 백엔드 성능 위험을 집중 리뷰할 때 사용.
 argument-hint: "[파일, diff, 엔드포인트, 쿼리, 리뷰 범위]"
 ---
 
@@ -26,8 +26,9 @@ argument-hint: "[파일, diff, 엔드포인트, 쿼리, 리뷰 범위]"
 3. transaction을 확인한다: lock scope, isolation level, transaction 내부 remote call, per-row flush/write, retry behavior.
 4. application resource를 확인한다: blocking IO, memory aggregation, expensive hot-loop work, cache correctness, timeout, circuit breaker, bounded retry.
 5. JPA/Hibernate에서는 `@ManyToOne`, `@OneToMany`, `@ManyToMany` 관계 어노테이션이 mapper, JSON serialization, logging, DTO construction, collection iteration에서 lazy loading 또는 broad graph fetch를 유발하는지 본다.
-6. 신규 Entity 성능 fix는 scalar FK + 명시 조인/projection을 우선한다. 다대다는 `@ManyToMany` 대신 연결 엔티티를 전제로 검토한다.
-7. coroutine이면 dispatcher 선택, `Dispatchers.IO` blocking 격리, unbounded fan-out, cancellation/timeout, thread/memory tradeoff를 확인한다.
+6. JPA Entity는 infrastructure/db-core에 두고 domain에는 순수 data class를 둔다. Entity `toDomain()`이 lazy association traversal로 성능 문제를 숨기지 않는지 확인한다.
+7. 신규 Entity 성능 fix는 scalar FK + 명시 조인/projection을 우선한다. 다대다는 `@ManyToMany` 대신 연결 엔티티를 전제로 검토한다.
+8. coroutine이면 dispatcher 선택, `Dispatchers.IO` blocking 격리, unbounded fan-out, cancellation/timeout, thread/memory tradeoff를 확인한다.
 
 ## 검증
 
@@ -40,6 +41,7 @@ argument-hint: "[파일, diff, 엔드포인트, 쿼리, 리뷰 범위]"
 - 미세 최적화보다 사용자 영향, 부하 상황, 확장성에 영향을 주는 병목을 우선한다.
 - 캐시는 stale data, stampede, invalidation, authorization leakage 위험을 함께 검토한다.
 - 관계 어노테이션 기반 객체 그래프 탐색을 성능 편의 기능으로 보지 않는다. hot path에서는 scalar FK, 명시 조인, projection, pagination을 우선한다.
+- domain의 순수 data class와 infrastructure/db-core Entity 경계를 섞어 lazy loading이나 serializer fetch를 숨기지 않는다. `toDomain()`은 현재 값만 사용하는 순수 mapping이어야 한다.
 - `Dispatchers.IO`는 DB pool, 외부 API limit, lock, heap pressure를 해결하지 못하므로 fan-out 경계를 함께 본다.
 
 ## 출력

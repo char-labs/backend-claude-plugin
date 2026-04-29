@@ -75,9 +75,34 @@ def main() -> None:
         "scalar FK",
     )
     assert_advisory_contains(
+        "emits entity domain boundary advisory",
+        {"tool_name": "Write", "tool_input": {"file_path": "src/main/kotlin/com/example/entity/PostEntity.kt"}},
+        "toDomain()",
+    )
+    assert_advisory_contains(
         "emits repository port adapter advisory",
         {"tool_name": "Write", "tool_input": {"file_path": "src/main/kotlin/com/example/repository/UserCoreRepository.kt"}},
         "*CoreRepository",
+    )
+    assert_advisory_contains(
+        "emits spring persistence config advisory",
+        {"tool_name": "Write", "tool_input": {"file_path": "src/main/kotlin/com/example/config/CoreDataSourceConfig.kt"}},
+        "ConfigurationProperties",
+    )
+    assert_advisory_contains(
+        "emits spring persistence yml advisory",
+        {"tool_name": "Write", "tool_input": {"file_path": "src/main/resources/db-core.yml"}},
+        "환경변수",
+    )
+    assert_advisory_contains(
+        "emits spring persistence flyway advisory",
+        {"tool_name": "Write", "tool_input": {"file_path": "src/main/resources/application.yml"}},
+        "Flyway",
+    )
+    assert_advisory_contains(
+        "emits jpa base entity advisory",
+        {"tool_name": "Write", "tool_input": {"file_path": "src/main/kotlin/com/example/support/BaseEntity.kt"}},
+        "equals/hashCode",
     )
     assert_advisory("emits stop advisory", {"hook_event_name": "Stop"}, "stop")
     assert_route(
@@ -91,6 +116,30 @@ def main() -> None:
         "UserRepository는 인터페이스로 두고 UserCoreRepository가 구현하게 해줘",
         "persistence-query-specialist",
         "persistence-query-review",
+    )
+    assert_route(
+        "routes entity domain boundary work",
+        "Entity는 Domain이 아니라 infrastructure/db-core에 두고 toDomain()으로 순수 data class로 변환해줘",
+        "backend-architect",
+        "design",
+    )
+    assert_route(
+        "routes spring persistence config work",
+        "Pida-Server처럼 DataSourceConfig, JpaConfig, db-core.yml을 프로젝트 모듈명에 맞게 만들어줘",
+        "backend-coder",
+        "spring-persistence-config",
+    )
+    assert_route(
+        "routes spring persistence flyway config work",
+        "Flyway 마이그레이션 yml 설정과 datasource locations를 persistence 설정에 맞춰줘",
+        "backend-coder",
+        "spring-persistence-config",
+    )
+    assert_route(
+        "routes jpa base entity work",
+        "BaseEntity에 MappedSuperclass, AuditingEntityListener, softDelete, equals/hashCode를 Pida 스타일로 반영해줘",
+        "backend-coder",
+        "jpa-base-entity",
     )
     assert_route(
         "routes API contract work",

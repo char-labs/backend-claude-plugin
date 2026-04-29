@@ -1,6 +1,6 @@
 ---
 name: oop-solid-reviewer
-description: 읽기 전용 OOP/SOLID 리뷰 에이전트. 클래스 책임, 추상화, 의존성 방향, Repository 포트/CoreRepository 어댑터, 도메인 모델링, scalar FK와 관계 어노테이션 결합도, 응집도, 테스트 가능성, 객체지향 설계 위반을 점검할 때 사용. 새 설계는 backend-architect, 종합 PR 리뷰는 backend-reviewer, 실제 수정은 backend-coder를 사용.
+description: 읽기 전용 OOP/SOLID 리뷰 에이전트. 클래스 책임, 추상화, 의존성 방향, JPA Entity infrastructure/db-core 위치, 순수 domain data class, toDomain mapping, Repository 포트/CoreRepository 어댑터, 도메인 모델링, scalar FK와 관계 어노테이션 결합도, 응집도, 테스트 가능성, 객체지향 설계 위반을 점검할 때 사용. 새 설계는 backend-architect, 종합 PR 리뷰는 backend-reviewer, 실제 수정은 backend-coder를 사용.
 tools: Read, Grep, Glob, LS, Skill
 permissionMode: default
 ---
@@ -34,6 +34,7 @@ permissionMode: default
 - 반복되는 순수 helper가 private method나 흩어진 메서드로 깊이를 늘리면 공용/도메인 확장 함수 추출을 제안합니다.
 - Kotlin 코드에서는 scope function, `when`, `is` smart cast가 중복 분기와 타입 처리 depth를 줄이는지 확인합니다.
 - 정적 팩토리와 application message type을 확인합니다. 생성 의도는 `from`/`of`/`create`, Service 결과는 `*Result`, 입력 목적은 `*Command`/`*Query`/`*Criteria`로 드러나는지 봅니다.
+- JPA Entity가 domain model 역할을 대신하는지 확인합니다. domain에는 순수 data class를 두고, infrastructure/db-core Entity는 `toDomain()`으로 domain 객체로 변환되어야 합니다.
 - Dependency inversion 관점에서 `*Repository`는 추상화된 포트, `*CoreRepository`는 infrastructure adapter 구현체인지 확인합니다. high-level Service/use-case가 `*JpaRepository`, `*CoreRepository`, `EntityManager`, QueryDSL factory에 직접 의존하면 finding 후보입니다.
 - JPA Entity가 객체 graph 탐색을 domain model처럼 숨기는지 확인합니다. 신규 코드는 scalar FK와 명시 조인/projection으로 persistence 결합을 낮추고, 관계 어노테이션은 legacy/명시 승인 예외로 봅니다.
 - `@ManyToMany`는 OOP 모델을 단순하게 보이게 하지만 연결 lifecycle을 숨길 수 있으므로 연결 엔티티로 분리하는 fix를 우선합니다.

@@ -33,6 +33,8 @@
 
 ## 도메인 데이터와 팩토리 패턴
 
+- domain package에는 JPA Entity가 아니라 framework-free 순수 data class/domain object를 둔다. `@Entity`, `@Table`, `@Column`, `@Id` 같은 persistence annotation은 infrastructure/db-core/persistence adapter에만 둔다.
+- JPA Entity는 DB schema와 JPA lifecycle을 표현하는 infrastructure model이다. Service/use case는 Entity를 직접 다루지 말고 `*Repository` 포트가 반환하는 domain 객체나 `*Result`를 사용한다.
 - domain object, DTO, command, query, criteria, result의 construction에 intent, default value, mapping, invariant, naming value가 있으면 Kotlin `companion object`의 static factory method를 우선한다.
 - factory name은 일관되게 사용한다. 단일 source mapping은 `from(source)`, 직접 값 조합은 `of(...)`, 새 domain/action 생성은 `create(command)`, `restore`, `empty`, `default` 같은 명시적 이름은 상태가 domain-meaningful할 때만 사용한다.
 - trivial local test data나 invariant가 없는 작은 immutable value에는 direct constructor도 허용한다. 다만 public application/domain construction에서 call site intent가 좋아진다면 named factory를 우선한다.
@@ -41,7 +43,7 @@
 - `Criteria`는 optional filter, sorting, pagination, search condition을 model해야 한다. immutable하게 유지하고 repository/query-builder behavior를 넣지 않는다.
 - `Command`는 use-case execution 전에 validate되어야 하며, persistence entity shape가 아니라 user intent를 담아야 한다.
 - `Query`는 read-side intent와 expected lookup shape를 표현해야 한다. security/ownership check는 query DTO construction 안에 숨기지 말고 use case 또는 Service에 둔다.
-- Entity, input model, command-like data class에서 domain object로 변환할 때는 관례가 다르지 않다면 `toDomain()`을 우선한다. `toDomain()`은 현재 객체의 값과 `userId`, `postId`, `categoryId` 같은 scalar FK만 사용해 domain model을 만드는 순수 mapping이어야 한다.
+- JPA Entity, input model, command-like data class에서 domain object로 변환할 때는 관례가 다르지 않다면 `toDomain()`을 우선한다. `toDomain()`은 현재 객체의 값과 `userId`, `postId`, `categoryId` 같은 scalar FK만 사용해 domain model을 만드는 순수 mapping이어야 한다.
 - `toDomain()`에는 repository/client 호출, authorization, transaction, lazy association traversal, 관계 어노테이션 탐색, 외부 clock/ID generator 호출을 넣지 않는다. 그런 책임은 Service, role component, domain factory가 소유한다.
 - 새 domain object의 기본값이 명확한 경우 `id = 0`, `deletedAt = null`, `thumbnailUrl = null`처럼 domain convention을 드러내는 값은 `toDomain()`에서 세팅할 수 있다. 다만 invariant 검증이나 생성 정책이 복잡하면 `Domain.create(command)` 또는 factory로 이동한다.
 - `../Pida-Server`, `../Sseudam-Server` 같은 sibling example repository에 접근할 수 있으면 새 local convention을 도입하기 전에 대표 `*Command`, `*Query`, `*Criteria`, `*Result`, companion factory, `*Repository` 포트와 `*CoreRepository` 구현체 example을 읽는다.
@@ -87,7 +89,7 @@ data class NewFlowerEvent(
 - Service/use case는 transaction과 orchestration을 소유한다.
 - Repository는 persistence access만 소유한다. repository code에 authorization이나 workflow state machine을 넣지 않는다.
 - `*Repository`는 추상화된 도메인/application 포트 인터페이스로 둔다. Service/use case는 이 포트에 의존하고 `*CoreRepository`, `*JpaRepository`, `EntityManager`, QueryDSL factory를 직접 주입받지 않는다.
-- `*CoreRepository`는 `*Repository`를 상속/구현한 infrastructure adapter다. 내부에서 `*JpaRepository`, `*CustomRepository`, QueryDSL, Redis/client adapter를 조합하고 Entity/domain/result mapping을 담당한다.
+- `*CoreRepository`는 `*Repository`를 상속/구현한 infrastructure adapter다. 내부에서 `*JpaRepository`, `*CustomRepository`, QueryDSL, Redis/client adapter를 조합하고 JPA Entity와 domain/result 사이의 `toDomain()` mapping을 담당한다.
 - `*JpaRepository`는 Spring Data 구현 세부사항이므로 infrastructure package 밖으로 노출하지 않는다. 포트 interface가 `JpaRepository`를 상속하거나 Spring Data type을 반환하면 경계 누수로 본다.
 - Configuration class에는 business logic을 넣지 않는다.
 - non-trivial business action을 큰 service 내부의 private method에 묻지 않는다. `UserCreator`, `PostDeleter`, `NotificationSender`, `FlowerSpotReader`처럼 role-oriented name을 가진 응집도 높은 component로 추출한다.
@@ -95,6 +97,17 @@ data class NewFlowerEvent(
 - 여러 Service, domain, transaction, side effect를 조율하는 복잡한 business flow에는 Facade를 사용한다.
 - validation, policy, state transition, repository access, port/adaptor coordination 같은 single-domain responsibility에는 Service를 사용한다.
 - Facade constructor는 Service에만 의존해야 한다. `Repository`, `EntityManager`, external client, mapper, port, role component를 Facade에 직접 주입하지 말고 해당 작업을 Service를 통해 노출한다.
+
+## Spring Persistence 설정
+
+- DataSourceConfig, JpaConfig, module yml은 프로젝트 module name, package root, profile convention, datasource purpose에 맞춘다. Pida-Server식 `db-core`, `db.core`, `coreDataSource` 이름은 참고 예시이며 그대로 복사하지 않는다.
+- `HikariConfig` bean은 `@ConfigurationProperties(prefix = "...")`로 yml prefix와 바인딩하고, `HikariDataSource` bean name과 `@Qualifier`는 context를 드러내게 짓는다.
+- `@EntityScan`과 `@EnableJpaRepositories`는 JPA Entity와 Spring Data `*JpaRepository`가 있는 infrastructure/db-core/persistence adapter package만 가리킨다. domain package를 넓게 scan하지 않는다.
+- yml에는 `spring.jpa.open-in-view: false`를 명시하고, `ddl-auto`, dialect, batch fetch size, SQL logging은 profile별 risk에 맞춘다.
+- JDBC URL, username, password, token은 `${ENV_NAME}` 환경변수 placeholder로만 둔다. secret 실값을 yml에 쓰지 않는다.
+- Flyway를 사용하면 `spring.flyway.locations`, `baseline-on-migrate`, `validate-on-migrate`, `clean-disabled`, target datasource/schema/table을 profile별로 확인한다. destructive migration이나 backfill 계획은 `migration-adr`로 분리한다.
+- 여러 datasource면 `@Primary`, datasource bean, entity manager factory, transaction manager, repository scan package, Flyway migration target을 datasource별로 분리한다.
+- persistence 설정 변경 후에는 `./gradlew :{module}:compileKotlin` 같은 좁은 compile/config validation을 먼저 확인한다.
 
 ## Coroutine과 동시성
 
@@ -119,6 +132,13 @@ data class NewFlowerEvent(
 
 ## JPA와 Hibernate
 
+- JPA Entity는 infrastructure/db-core/persistence adapter 소유다. domain module에는 `@Entity`가 붙은 class를 두지 않고, JPA 의존이 없는 순수 data class/domain object만 둔다.
+- BaseEntity는 JPA Entity 공통 superclass이며 infrastructure/db-core/persistence adapter의 support package에 둔다. domain에는 BaseEntity를 두지 않는다.
+- BaseEntity 기본형은 `@MappedSuperclass`, `AuditingEntityListener`, `GenerationType.IDENTITY` id, `createdAt`/`updatedAt`/`deletedAt`, `softDelete`, id 기반 `equals/hashCode`를 한 세트로 본다.
+- `createdAt`은 생성 후 변경하지 않고, `updatedAt`/`deletedAt` setter는 `protected set`으로 제한한다. 생성/수정 timestamp는 기존 convention에 맞춰 `@CreationTimestamp`/`@UpdateTimestamp` 또는 Spring Data auditing을 선택한다.
+- `softDelete()`는 `deletedAt` 설정만 담당한다. 모든 read query의 `deletedAt is null` 필터, unique/index, 복구/하드삭제 정책은 repository/query 설계에서 별도로 확인한다.
+- `equals`는 id가 null이면 false이고, 같은 class와 같은 persisted id일 때 true여야 한다. `hashCode`는 mutable field를 사용하지 않는다.
+- `kotlin.reflect.full.isSubclassOf`를 쓰는 equals 조건은 같은 class에서도 false가 되지 않는지 확인한다. `!this::class.isSubclassOf(other::class) || other::class.isSubclassOf(this::class)` 형태는 같은 class도 false가 될 수 있으므로 피한다.
 - 신규 Entity는 객체 참조 관계보다 scalar FK 필드를 우선한다. 예: `PostEntity(val userId: Long, ...)`, `CommentEntity(val postId: Long, val userId: Long, ...)`.
 - 조회 조합은 `@ManyToOne`, `@OneToMany`, `@ManyToMany` 관계 어노테이션 탐색이 아니라 Repository, QueryDSL, SQL, JPQL의 명시 조인, projection, `*Result` mapping으로 구성한다.
 - `@OneToMany` collection field는 신규 코드에서 기본 금지한다. `findByPostId`, pagination query, projection, explicit count/read model로 대체한다.
@@ -149,6 +169,9 @@ data class NewFlowerEvent(
 ## 흔한 Spring/Kotlin Finding
 
 - `map`, `forEach`, resolver method, lazy collection access 내부의 repository call로 발생하는 N+1.
+- domain package나 domain module에 `@Entity`, `@Table`, `@Column`, `@Id`가 붙은 JPA Entity가 들어간 구조. Entity는 infrastructure/db-core로 이동하고 domain에는 순수 data class를 둔 뒤 `toDomain()`으로 변환한다.
+- BaseEntity가 domain package에 있거나, `equals`가 같은 class와 같은 id에서 false를 반환하거나, `hashCode`가 mutable timestamp/name/status를 사용하는 구조.
+- `deletedAt`와 `softDelete()`는 있지만 repository/query에서 삭제 row 제외가 없는 구조.
 - 신규 Entity에 `@ManyToOne`, `@OneToMany`, `@ManyToMany` 관계 어노테이션을 기본값처럼 추가해 scalar FK와 명시 조인 경계를 흐리는 구조.
 - `@ManyToMany`를 직접 사용해 연결 테이블의 lifecycle, audit, 권한, 삭제 정책을 숨기는 구조. 연결 엔티티로 분리해야 한다.
 - `*Repository`가 Spring Data `JpaRepository`를 직접 상속하거나 `*CoreRepository` 없이 persistence detail을 Service/use case에 노출하는 구조.
@@ -167,7 +190,7 @@ data class NewFlowerEvent(
 - 중첩 scope function이나 긴 chain으로 receiver와 `it` 의미가 불명확하거나 side effect가 숨겨지는 구조.
 - enum/sealed/status 분기를 흩어진 `if/else`로 처리해 상태 추가 시 누락 위험이 커지는 구조. 가능한 exhaustive `when`을 쓴다.
 - 생성 의도, invariant, mapping이 있는 객체를 public constructor 직접 호출로 흩어 놓는 구조. companion object의 `from`, `of`, `create` 같은 정적 팩토리로 intent를 드러낸다.
-- Entity/input model/domain command에서 domain model로 가는 변환이 흩어진 mapper나 Service 내부 constructor 호출로 반복되는 구조. 순수 변환이면 `toDomain()`으로 모으고, 생성 정책이 복잡하면 domain factory로 올린다.
+- JPA Entity/input model/domain command에서 domain model로 가는 변환이 흩어진 mapper나 Service 내부 constructor 호출로 반복되는 구조. 순수 변환이면 `toDomain()`으로 모으고, 생성 정책이 복잡하면 domain factory로 올린다.
 - Service 결과가 primitive, tuple, API response DTO, entity 그대로 반환되어 application boundary가 흐려지는 구조. 명시적 `*Result` 타입을 우선한다.
 - write/read/filter intent를 하나의 DTO로 섞는 구조. `*Command`, `*Query`, `*Criteria`로 목적을 나눈다.
 - coroutine 도입 이유 없이 blocking MVC/JPA 흐름을 suspend로 감싼 구조.

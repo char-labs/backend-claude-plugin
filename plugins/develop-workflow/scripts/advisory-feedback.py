@@ -107,6 +107,37 @@ def repositoryish(path: str) -> bool:
     )
 
 
+def base_entityish(path: str) -> bool:
+    normalized = path.replace("\\", "/")
+    lowered = normalized.lower()
+    name = Path(normalized).name.lower()
+    return (
+        ("src/main/" in lowered or "/src/main/" in lowered)
+        and (
+            name in {"baseentity.kt", "baseentity.java"}
+            or name.endswith("baseentity.kt")
+            or name.endswith("baseentity.java")
+        )
+    )
+
+
+def persistence_configish(path: str) -> bool:
+    normalized = path.replace("\\", "/")
+    lowered = normalized.lower()
+    name = Path(normalized).name.lower()
+    return (
+        ("src/main/" in lowered or "/src/main/" in lowered)
+        and (
+            name.endswith("datasourceconfig.kt")
+            or name.endswith("datasourceconfig.java")
+            or name.endswith("jpaconfig.kt")
+            or name.endswith("jpaconfig.java")
+            or name in {"application.yml", "application.yaml", "db-core.yml", "db-core.yaml"}
+            or ("/resources/" in lowered and "datasource" in name and name.endswith((".yml", ".yaml", ".properties")))
+        )
+    )
+
+
 def post_tool(data: dict) -> None:
     tool_input = data.get("tool_input", {})
     if not isinstance(tool_input, dict):
@@ -124,6 +155,16 @@ def post_tool(data: dict) -> None:
             "Backend test 안내: 비즈니스 로직, 분기, 인가, 쿼리, 오류 처리, 회귀 위험을 증명할 때만 테스트를 작성하세요. 단순 DTO/상수/설정 변경이면 새 테스트보다 compile/static validation을 우선하세요. 실 DB와 테스트 @Transactional rollback에는 의존하지 마세요."
         )
         return
+    if persistence_configish(path):
+        emit(
+            "Spring persistence 설정 안내: DataSourceConfig/JpaConfig/yml은 Pida-Server식 구조를 참고하되 db-core/db.core 이름을 복사하지 말고 프로젝트 module/package/profile/prefix에 맞추세요. HikariConfig, ConfigurationProperties, EntityScan, EnableJpaRepositories, open-in-view, Flyway locations/baseline/validate/clean-disabled, 환경변수 placeholder, secret 미노출, compile/config validation을 함께 확인하세요."
+        )
+        return
+    if base_entityish(path):
+        emit(
+            "JPA BaseEntity 안내: BaseEntity는 infrastructure/db-core/persistence adapter의 support에 두고 @MappedSuperclass, AuditingEntityListener, GenerationType.IDENTITY, createdAt/updatedAt/deletedAt, softDelete, equals/hashCode를 함께 확인하세요. equals는 같은 class와 같은 id에서 true가 되어야 하며, soft delete는 deletedAt 필드뿐 아니라 조회 필터도 필요합니다."
+        )
+        return
     if repositoryish(path):
         emit(
             "Repository 안내: *Repository는 추상화된 도메인/application 포트 인터페이스로 두고, *CoreRepository가 *Repository를 구현하게 하세요. *JpaRepository/*CustomRepository/QueryDSL은 infrastructure 내부에서 *CoreRepository가 위임받고, Service/use-case에는 *Repository만 주입하세요."
@@ -131,7 +172,7 @@ def post_tool(data: dict) -> None:
         return
     if entityish(path):
         emit(
-            "JPA Entity 안내: 신규 Entity는 @ManyToOne/@OneToMany/@ManyToMany/JoinColumn 관계 어노테이션보다 userId, postId 같은 scalar FK를 우선하세요. 조회 조합은 Repository/QueryDSL/SQL/JPQL 명시 조인과 projection으로 만들고, 다대다는 연결 엔티티를 사용하세요."
+            "JPA Entity 안내: Entity는 domain이 아니라 infrastructure/db-core/persistence adapter 소유입니다. domain에는 JPA annotation 없는 순수 data class를 두고 Entity는 toDomain()으로 변환하세요. 신규 Entity는 관계 어노테이션보다 scalar FK를 우선하고, 다대다는 연결 엔티티로 풀며, 조회 조합은 Repository/QueryDSL/SQL/JPQL 명시 조인과 projection으로 만드세요."
         )
         return
     emit(

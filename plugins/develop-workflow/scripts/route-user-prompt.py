@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """UserPromptSubmit router for develop-workflow.
 
 Emits a compact routing protocol only for backend development work. It avoids
@@ -24,6 +25,8 @@ class Route:
 
 ROUTES: list[Route] = [
     Route("security", "security-reviewer", "security-review", "인증/인가, 접근 제어, 객체 권한, 인젝션, SSRF, 시크릿, 토큰, CORS/CSRF, 레이트 리밋, 민감정보 로깅 등 보안 위험"),
+    Route("persistence-config", "backend-coder", "spring-persistence-config", "Spring/Kotlin DataSourceConfig, JpaConfig, HikariConfig, ConfigurationProperties, EntityScan, EnableJpaRepositories, Flyway, application.yml/db-core.yml, datasource yml/profile/env 설정, 프로젝트별 persistence 설정"),
+    Route("base-entity", "backend-coder", "jpa-base-entity", "Spring/Kotlin JPA BaseEntity, @MappedSuperclass, AuditingEntityListener, GenerationType.IDENTITY, createdAt/updatedAt/deletedAt, softDelete, equals/hashCode 설정"),
     Route("query", "persistence-query-specialist", "persistence-query-review", "`*Repository` 포트, `*CoreRepository` 구현체, `*JpaRepository` 분리, SQL/JPQL/QueryDSL, JPA fetch, scalar FK, 관계 어노테이션 지양, 연결 엔티티, N+1, 인덱스, 페이지네이션, 데이터 접근 권한 등 영속성/쿼리 작업"),
     Route("api-response", "api-contract-designer", "api-response-contract", "Spring/Kotlin REST 공통 응답 envelope, ApiResponse, ErrorResponse, ResponseBodyAdvice, RestControllerAdvice, ExceptionHandler, ResponseEntityExceptionHandler, controller 반환 DTO, RestDocs 응답 필드 정책"),
     Route("api-contract", "api-contract-designer", "api-contract-design", "GraphQL, gRPC/protobuf, REST/OpenAPI, 요청/응답 DTO, 스키마, 하위 호환성 등 API 계약 설계"),
@@ -33,7 +36,7 @@ ROUTES: list[Route] = [
     Route("concurrency", "coroutine-concurrency-specialist", "spring-coroutine-concurrency", "Spring Boot + Kotlin coroutine, suspend, coroutineScope/supervisorScope, Dispatchers.IO, blocking IO, 경량 스레드, cancellation/timeout, thread/memory tradeoff"),
     Route("performance", "performance-reviewer", "performance-review", "응답 시간, 처리량, 캐시, 타임아웃, 재시도, 락, 메모리, 커넥션풀, 시스템 병목"),
     Route("review", "backend-reviewer", "review", "PR, diff, 코드리뷰, 감사, 머지 전 검토, 품질 게이트, 전반적 백엔드 리뷰"),
-    Route("design", "backend-architect", "design", "백엔드 아키텍처, 서비스 경계, 도메인 모델, Repository 포트/CoreRepository 어댑터, 트랜잭션, 권한 소유, 계층 설계"),
+    Route("design", "backend-architect", "design", "백엔드 아키텍처, 서비스 경계, 도메인 모델, JPA Entity infrastructure/db-core 위치, 순수 data class, toDomain() mapping, Repository 포트/CoreRepository 어댑터, 트랜잭션, 권한 소유, 계층 설계"),
     Route("implement", "backend-coder", "implement", "더 적합한 전문 에이전트가 없고 실제 백엔드 코드 구현/수정이 필요한 작업"),
 ]
 
@@ -51,6 +54,8 @@ NON_BACKEND_PATTERNS = [
 CATEGORY_PATTERNS: list[tuple[str, list[str]]] = [
     ("security", [r"\bsecurity\b", r"\bauth(orization|entication)?\b", r"\bcsrf\b", r"\bcors\b", r"\bssrf\b", r"\binjection\b", r"\bsecret\b", r"\btoken\b", r"\bjwt\b", r"\bcredential\b", r"\bpermission\b", r"\bprivilege\b", r"\bforbidden\b", r"\bunauthorized\b", r"\banother account\b", r"\banother user's data\b", r"\bcannot read another\b", r"보안|취약점?|취약|인증|인가|권한|접근\s*제어|객체\s*권한|권한\s*상승|권한\s*우회|토큰|JWT|쿠키|세션|CSRF|CORS|SSRF|인젝션|SQL\s*인젝션|시크릿|비밀키|자격\s*증명|개인정보|민감정보|민감\s*데이터|로깅|암호화|해시|레이트\s*리밋|속도\s*제한|탈취|우회|다른\s*계정|다른\s*사용자"]),
     ("migration", [r"\bmigrat(e|ion)\b", r"\bbackfill\b", r"\brollout\b", r"\brollback\b", r"\bstrangler\b", r"\bblue[- ]green\b", r"\bdynamodb\b", r"\bstorage\b", r"마이그레이션|전환|이관|백필|backfill|롤아웃|롤백|블루\s*그린|스트랭글러|DynamoDB|스토리지\s*전환|DB\s*전환|스키마\s*변경|데이터\s*이동|무중단"]),
+    ("persistence-config", [r"\bdatasource\s*config\b", r"\bdata\s*source\s*config\b", r"\bjpa\s*config\b", r"\bhikari(config|datasource)?\b", r"\bconfigurationproperties\b", r"\bentityscan\b", r"\benablejparepositories\b", r"\bopen-in-view\b", r"\bspring\.flyway\.", r"\bflyway\b.*\b(config|setting|datasource|data\s*source|location|locations|baseline|schema|table|yml|yaml|properties)\b", r"\bdatasource\.[a-z0-9_.-]+\b", r"\bapplication[-a-z0-9]*\.ya?ml\b", r"\bdb[- ]?core\.ya?ml\b", r"DataSourceConfig|JpaConfig|HikariConfig|HikariDataSource|ConfigurationProperties|EntityScan|EnableJpaRepositories|open-in-view|Flyway.*(설정|마이그레이션\s*설정|yml|yaml|데이터소스|datasource|location|locations|baseline|schema|스키마|테이블)|플라이웨이.*(설정|마이그레이션\s*설정|yml|yaml|데이터소스|스키마|테이블)|datasource\s*yml|datasource\s*설정|데이터소스\s*설정|JPA\s*설정|하이버네이트\s*설정|Hikari\s*설정|히카리\s*설정|yml\s*설정|프로필\s*설정|환경변수\s*설정|db[- ]?core\.ya?ml|db\s*core\s*yml"]),
+    ("base-entity", [r"\bbase\s*entity\b", r"\bbaseentity\b", r"\bmapped\s*superclass\b", r"\bmappedsuperclass\b", r"\bauditingentitylistener\b", r"\bcreationtimestamp\b", r"\bupdatetimestamp\b", r"\bgenerationtype\.identity\b", r"\bsoft\s*delete\b", r"\bsoftdelete\b", r"\bdeletedat\b", r"\bcreatedat\b", r"\bupdatedat\b", r"\bequals/hashcode\b", r"BaseEntity|Base\s*Entity|MappedSuperclass|AuditingEntityListener|CreationTimestamp|UpdateTimestamp|GenerationType\.IDENTITY|softDelete|soft\s*delete|소프트\s*삭제|deletedAt|createdAt|updatedAt|equals/hashCode|equals\s*hashCode|공통\s*Entity|공통\s*엔티티|베이스\s*엔티티"]),
     ("query", [r"\brepository\b", r"\bcore\s*repository\b", r"\bcorerepository\b", r"\bjpa\s*repository\b", r"\bjparepository\b", r"\bcustom\s*repository\b", r"\bcustomrepository\b", r"\brepository\s*port\b", r"\bquerydsl\b", r"\bjpql\b", r"\bsql\b", r"\bjpa\b", r"\bhibernate\b", r"\bn\+1\b", r"\bindex\b", r"\bfetch join\b", r"\bpagination\b", r"\bfindall\b", r"\bmanytoone\b", r"\bonetomany\b", r"\bmanytomany\b", r"\bjoincolumn\b", r"\bscalar fk\b", r"\bforeign key\b", r"쿼리|레포지토리|리포지토리|저장소|영속성|Repository\s*포트|레포지토리\s*포트|리포지토리\s*포트|저장소\s*포트|Repository\s*추상화|레포지토리\s*추상화|CoreRepository|코어\s*레포지토리|JpaRepository|JPARepository|CustomRepository|JPA\s*Repository\s*분리|JPA\s*리포지토리\s*분리|JPA|하이버네이트|QueryDSL|JPQL|\bSQL\b|N\+1|페치\s*조인|fetch\s*join|인덱스|페이지네이션|페이징|정렬|필터|카운트|count|findAll|조회\s*(쿼리|성능|최적화)?|DB\s*(조회|부하|쿼리)|ManyToOne|OneToMany|ManyToMany|JoinColumn|관계\s*어노테이션|외래키|스칼라\s*FK|scalar\s*FK|FK\s*기반|명시\s*조인|연결\s*엔티티"]),
     ("concurrency", [r"\bcoroutine(s)?\b", r"\bsuspend\b", r"\bdispatchers?\.io\b", r"\bcoroutinescope\b", r"\bsupervisorscope\b", r"\basync\b", r"\bawait(all)?\b", r"\brunblocking\b", r"\bkotlin\s+flow\b", r"\bflowof\b", r"\bflow\s*[<{]", r"\bstructured concurrency\b", r"\bnon[- ]blocking\b", r"\bblocking io\b", r"코루틴|Coroutine|coroutineScope|supervisorScope|Dispatchers\.IO|런블로킹|runBlocking|비동기|동시성|경량\s*스레드|블로킹\s*IO|논블로킹|suspend|서스펜드|async|await|코틀린\s*Flow|structured\s*concurrency"]),
     ("performance", [r"\bperformance\b", r"\blatency\b", r"\bslow\b", r"\btimeout\b", r"\bretry\b", r"\bcache\b", r"\bredis\b", r"\bmemory\b", r"\block\b", r"\bthroughput\b", r"\btps\b", r"\bconnection pool\b", r"\bhikari\b", r"성능|응답\s*시간|응답이\s*\d+\s*초|지연|느림|느려|병목|처리량|TPS|캐시|Redis|타임아웃|재시도|락|락\s*경합|메모리|스레드|커넥션\s*풀|Hikari|부하|최적화|장애\s*전파"]),
@@ -59,7 +64,7 @@ CATEGORY_PATTERNS: list[tuple[str, list[str]]] = [
     ("api-response", [r"\bapiresponse\b", r"\berrorresponse\b", r"\bresponsebodyadvice\b", r"\brestcontrolleradvice\b", r"\bcontrolleradvice\b", r"\bexceptionhandler\b", r"\bresponseentityexceptionhandler\b", r"\bresponse envelope\b", r"\bresponse wrapper\b", r"ApiResponse|ErrorResponse|ResponseBodyAdvice|RestControllerAdvice|ControllerAdvice|ExceptionHandler|ResponseEntityExceptionHandler|공통\s*응답|응답\s*(래퍼|랩퍼|Wrapper|Envelope|엔벨로프)|응답\s*포맷|성공\s*응답|실패\s*응답|예외\s*응답|에러\s*응답|전역\s*예외|Controller\s*Advice|컨트롤러\s*어드바이스|RestDocs\s*응답\s*필드"]),
     ("api-contract", [r"\bgraphql\b", r"\bgrpc\b", r"\bproto(buf)?\b", r"\bopenapi\b", r"\brest\b", r"\bendpoint\b", r"\bapi\b", r"\bschema\b", r"\brequest\b", r"\bresponse\b", r"\bdto\b", r"GraphQL|gRPC|Proto|Protobuf|OpenAPI|REST|API|스키마|엔드포인트|입출력|요청|응답|DTO|리졸버|Resolver|컨트랙트|계약|하위\s*호환|필드\s*추가|메서드\s*추가"]),
     ("review", [r"\breview\b", r"\bpr\b", r"\bdiff\b", r"\baudit\b", r"\bpre[- ]merge\b", r"리뷰|코드\s*리뷰|검토|검수|감사|\bPR\b|풀리퀘|머지\s*전|변경\s*사항|diff|품질\s*게이트"]),
-    ("design", [r"\bdesign\b", r"\barchitecture\b", r"\bdomain model\b", r"\bboundary\b", r"\btransaction\b", r"\bservice design\b", r"\boop\b", r"\bsolid\b", r"\bdesign pattern(s)?\b", r"\bstrategy pattern\b", r"\btemplate method\b", r"\bstate pattern\b", r"\bspecification pattern\b", r"\badapter pattern\b", r"\bdecorator pattern\b", r"\bchain of responsibility\b", r"\bpipeline pattern\b", r"\bstatic factory\b", r"\bfactory method\b", r"\bcompanion object\b", r"\bcriteria pattern\b", r"\bcommand pattern\b", r"\bquery pattern\b", r"\bresult type\b", r"\blink entity\b", r"설계|아키텍처|도메인\s*모델|도메인|경계|서비스\s*경계|계층|레이어|트랜잭션|유스케이스|Use\s*Case|책임\s*분리|의존성\s*방향|모듈\s*구조|객체\s*지향|객체지향|디자인\s*패턴|전략\s*패턴|템플릿\s*메서드|상태\s*패턴|명세\s*패턴|정책\s*패턴|어댑터\s*패턴|데코레이터\s*패턴|책임\s*연쇄|파이프라인\s*패턴|정적\s*팩토리|팩토리\s*메서드|Command\s*패턴|Query\s*패턴|Criteria\s*패턴|Result\s*타입|연결\s*엔티티\s*설계"]),
+    ("design", [r"\bdesign\b", r"\barchitecture\b", r"\bdomain model\b", r"\bboundary\b", r"\binfrastructure\b", r"\bdb[- ]?core\b", r"\bpersistence adapter\b", r"\btodomain(?:\(\))?", r"\bpure data class\b", r"\btransaction\b", r"\bservice design\b", r"\boop\b", r"\bsolid\b", r"\bdesign pattern(s)?\b", r"\bstrategy pattern\b", r"\btemplate method\b", r"\bstate pattern\b", r"\bspecification pattern\b", r"\badapter pattern\b", r"\bdecorator pattern\b", r"\bchain of responsibility\b", r"\bpipeline pattern\b", r"\bstatic factory\b", r"\bfactory method\b", r"\bcompanion object\b", r"\bcriteria pattern\b", r"\bcommand pattern\b", r"\bquery pattern\b", r"\bresult type\b", r"\blink entity\b", r"설계|아키텍처|도메인\s*모델|도메인|순수\s*data\s*class|순수\s*데이터\s*클래스|순수\s*객체|infrastructure|인프라|db[- ]?core|db\s*코어|toDomain(?:\(\))?|경계|서비스\s*경계|계층|레이어|트랜잭션|유스케이스|Use\s*Case|책임\s*분리|의존성\s*방향|모듈\s*구조|객체\s*지향|객체지향|디자인\s*패턴|전략\s*패턴|템플릿\s*메서드|상태\s*패턴|명세\s*패턴|정책\s*패턴|어댑터\s*패턴|데코레이터\s*패턴|책임\s*연쇄|파이프라인\s*패턴|정적\s*팩토리|팩토리\s*메서드|Command\s*패턴|Query\s*패턴|Criteria\s*패턴|Result\s*타입|연결\s*엔티티\s*설계"]),
     ("implement", [r"\bimplement\b", r"\bmodify\b", r"\bfix\b", r"\badd\b", r"\bcreate\b", r"\bupdate\b", r"\brefactor\b", r"구현|수정|추가|고쳐|고치|작성|생성|변경|업데이트|리팩터|리팩토링|버그\s*수정|기능\s*추가"]),
 ]
 
@@ -67,8 +72,8 @@ BACKEND_HINTS = [
     r"\bbackend\b", r"\bspring\b", r"\bkotlin\b", r"\bjava\b", r"\bservice\b",
     r"\bcontroller\b", r"\buse case\b", r"\bdatabase\b", r"\bmysql\b",
     r"\bpostgres\b", r"\bredis\b", r"\bkafka\b", r"\bapi\b", r"\bgraphql\b",
-    r"\bgrpc\b", r"\bjpa\b", r"\brepository\b", r"\bcorerepository\b", r"\bjparepository\b", r"\btransaction\b", r"\bcoroutine\b", r"\bsuspend\b",
-    r"백엔드|서버|서버사이드|스프링|코틀린|자바|서비스|컨트롤러|유스케이스|데이터베이스|DB|레포지토리|리포지토리|트랜잭션|도메인|엔티티|JPA|QueryDSL|GraphQL|gRPC|API",
+    r"\bgrpc\b", r"\bjpa\b", r"\brepository\b", r"\bcorerepository\b", r"\bjparepository\b", r"\binfrastructure\b", r"\bdb[- ]?core\b", r"\btodomain(?:\(\))?", r"\btransaction\b", r"\bcoroutine\b", r"\bsuspend\b",
+    r"백엔드|서버|서버사이드|스프링|코틀린|자바|서비스|컨트롤러|유스케이스|데이터베이스|DB|레포지토리|리포지토리|트랜잭션|도메인|엔티티|인프라|db[- ]?core|toDomain(?:\(\))?|JPA|QueryDSL|GraphQL|gRPC|API",
 ]
 
 
@@ -99,6 +104,14 @@ def classify(prompt: str) -> tuple[str, str]:
         return "unclear", "백엔드 기능 요청이지만 대상 동작과 성공 기준이 부족함"
     if re.search(r"\b(pr|diff|pre[- ]merge)\b|풀리퀘|머지\s*전|변경\s*사항", text, re.IGNORECASE):
         return "review", "PR/diff/머지 전 변경 검토 요청"
+    persistence_config_patterns = next(patterns for category, patterns in CATEGORY_PATTERNS if category == "persistence-config")
+    if matches_any(lowered, persistence_config_patterns):
+        return "persistence-config", "Spring persistence 설정 요청"
+    base_entity_patterns = next(patterns for category, patterns in CATEGORY_PATTERNS if category == "base-entity")
+    if matches_any(lowered, base_entity_patterns):
+        return "base-entity", "JPA BaseEntity 공통 superclass 요청"
+    if re.search(r"(entity|엔티티|jpa).*(domain|도메인|infrastructure|인프라|db[- ]?core|db\s*코어|todomain)|(domain|도메인).*(entity|엔티티|jpa|@entity|@table|@column|@id|infrastructure|인프라|db[- ]?core|db\s*코어|todomain)|(@entity|@table|@column|@id).*(domain|도메인)", text, re.IGNORECASE):
+        return "design", "JPA Entity와 domain/infrastructure 계층 경계 요청"
 
     for category, patterns in CATEGORY_PATTERNS:
         if matches_any(lowered, patterns):

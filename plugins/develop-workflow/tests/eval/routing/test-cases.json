@@ -196,6 +196,48 @@
     "expected_skill": "persistence-query-review"
   },
   {
+    "id": "K17",
+    "type": "korean",
+    "prompt": "Entity는 Domain이 아니라 infrastructure/db-core에 두고 toDomain()으로 순수 data class로 변환해줘",
+    "expected_agent": "backend-architect",
+    "expected_skill": "design"
+  },
+  {
+    "id": "K18",
+    "type": "korean",
+    "prompt": "Pida-Server처럼 DataSourceConfig, JpaConfig, db-core.yml을 프로젝트 모듈명에 맞게 만들어줘",
+    "expected_agent": "backend-coder",
+    "expected_skill": "spring-persistence-config"
+  },
+  {
+    "id": "K19",
+    "type": "korean",
+    "prompt": "HikariConfig와 ConfigurationProperties prefix를 yml 설정에 맞추고 EntityScan도 패키지에 맞게 잡아줘",
+    "expected_agent": "backend-coder",
+    "expected_skill": "spring-persistence-config"
+  },
+  {
+    "id": "K20",
+    "type": "korean",
+    "prompt": "BaseEntity에 MappedSuperclass, AuditingEntityListener, softDelete, equals/hashCode를 Pida 스타일로 반영해줘",
+    "expected_agent": "backend-coder",
+    "expected_skill": "jpa-base-entity"
+  },
+  {
+    "id": "K21",
+    "type": "korean",
+    "prompt": "Flyway 마이그레이션 yml 설정과 datasource locations를 persistence 설정에 맞춰줘",
+    "expected_agent": "backend-coder",
+    "expected_skill": "spring-persistence-config"
+  },
+  {
+    "id": "K22",
+    "type": "korean",
+    "prompt": "Flyway 마이그레이션 롤백 계획과 backfill 전략을 세워줘",
+    "expected_agent": "migration-planner",
+    "expected_skill": "migration-adr"
+  },
+  {
     "id": "C01",
     "type": "direct",
     "prompt": "Review this Spring Kotlin coroutineScope code and check Dispatchers.IO for blocking calls",

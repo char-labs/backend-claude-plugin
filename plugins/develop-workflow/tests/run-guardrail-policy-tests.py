@@ -181,6 +181,7 @@ def assert_jpa_scalar_fk_relation_policy() -> None:
         ROOT / "agents" / "oop-solid-reviewer.md",
         ROOT / "scripts" / "route-user-prompt.py",
         ROOT / "scripts" / "advisory-feedback.py",
+        workflow_guide / "skills" / "backend-skill-authoring" / "SKILL.md",
         workflow_guide / "references" / "backend-skill-authoring-patterns.md",
         workflow_guide / "templates" / "backend-domain-skill-template.md",
     ]
@@ -220,6 +221,38 @@ def assert_repository_port_core_adapter_policy() -> None:
                 fail(f"Repository port/CoreRepository policy must mention {marker}: {path}")
 
 
+def assert_jpa_entity_domain_boundary_policy() -> None:
+    workflow_guide = ROOT.parent / "workflow-guide"
+    required_files = [
+        ROOT / "references" / "architecture-principles.md",
+        ROOT / "references" / "persistence-query-patterns.md",
+        ROOT / "references" / "spring-kotlin-backend.md",
+        ROOT / "skills" / "design" / "SKILL.md",
+        ROOT / "skills" / "implement" / "SKILL.md",
+        ROOT / "skills" / "persistence-query-review" / "SKILL.md",
+        ROOT / "skills" / "spring-kotlin-review" / "SKILL.md",
+        ROOT / "skills" / "performance-review" / "SKILL.md",
+        ROOT / "skills" / "review" / "SKILL.md",
+        ROOT / "agents" / "backend-architect.md",
+        ROOT / "agents" / "backend-coder.md",
+        ROOT / "agents" / "backend-reviewer.md",
+        ROOT / "agents" / "persistence-query-specialist.md",
+        ROOT / "agents" / "performance-reviewer.md",
+        ROOT / "agents" / "oop-solid-reviewer.md",
+        ROOT / "scripts" / "route-user-prompt.py",
+        ROOT / "scripts" / "advisory-feedback.py",
+        ROOT / "tests" / "eval" / "routing" / "test-cases.json",
+        workflow_guide / "skills" / "backend-skill-authoring" / "SKILL.md",
+        workflow_guide / "references" / "backend-skill-authoring-patterns.md",
+        workflow_guide / "templates" / "backend-domain-skill-template.md",
+    ]
+    for path in required_files:
+        text = read(path)
+        for marker in ("infrastructure/db-core", "순수 data class", "toDomain()"):
+            if marker not in text:
+                fail(f"JPA Entity/domain boundary policy must mention {marker}: {path}")
+
+
 def assert_api_response_contract_policy() -> None:
     required_files = [
         ROOT / "skills" / "api-response-contract" / "SKILL.md",
@@ -235,6 +268,72 @@ def assert_api_response_contract_policy() -> None:
                 fail(f"API response contract policy must mention {marker}: {path}")
 
 
+def assert_spring_persistence_config_policy() -> None:
+    workflow_guide = ROOT.parent / "workflow-guide"
+    required_files = [
+        ROOT / "skills" / "spring-persistence-config" / "SKILL.md",
+        ROOT / "references" / "spring-persistence-config.md",
+        ROOT / "references" / "spring-kotlin-backend.md",
+        ROOT / "skills" / "design" / "SKILL.md",
+        ROOT / "skills" / "implement" / "SKILL.md",
+        ROOT / "agents" / "backend-architect.md",
+        ROOT / "agents" / "backend-coder.md",
+        ROOT / "scripts" / "advisory-feedback.py",
+        workflow_guide / "skills" / "backend-skill-authoring" / "SKILL.md",
+        workflow_guide / "references" / "backend-skill-authoring-patterns.md",
+    ]
+    for path in required_files:
+        text = read(path)
+        for marker in ("HikariConfig", "ConfigurationProperties", "EntityScan", "EnableJpaRepositories", "open-in-view", "Flyway", "환경변수"):
+            if marker not in text:
+                fail(f"Spring persistence config policy must mention {marker}: {path}")
+
+    route_text = read(ROOT / "scripts" / "route-user-prompt.py")
+    for marker in ("persistence-config", "spring-persistence-config", "DataSourceConfig", "JpaConfig", "Flyway", "db-core.yml"):
+        if marker not in route_text:
+            fail(f"Spring persistence config routing must mention {marker}")
+
+    cases_text = read(ROOT / "tests" / "eval" / "routing" / "test-cases.json")
+    for marker in ("spring-persistence-config", "DataSourceConfig", "JpaConfig", "Flyway"):
+        if marker not in cases_text:
+            fail(f"Spring persistence config routing fixture must mention {marker}")
+
+
+def assert_jpa_base_entity_policy() -> None:
+    workflow_guide = ROOT.parent / "workflow-guide"
+    required_files = [
+        ROOT / "skills" / "jpa-base-entity" / "SKILL.md",
+        ROOT / "references" / "jpa-base-entity.md",
+        ROOT / "references" / "spring-kotlin-backend.md",
+        ROOT / "skills" / "design" / "SKILL.md",
+        ROOT / "skills" / "implement" / "SKILL.md",
+        ROOT / "skills" / "review" / "SKILL.md",
+        ROOT / "skills" / "spring-kotlin-review" / "SKILL.md",
+        ROOT / "agents" / "backend-architect.md",
+        ROOT / "agents" / "backend-coder.md",
+        ROOT / "agents" / "backend-reviewer.md",
+        ROOT / "scripts" / "advisory-feedback.py",
+        workflow_guide / "skills" / "backend-skill-authoring" / "SKILL.md",
+        workflow_guide / "references" / "backend-skill-authoring-patterns.md",
+        workflow_guide / "templates" / "backend-domain-skill-template.md",
+    ]
+    for path in required_files:
+        text = read(path)
+        for marker in ("BaseEntity", "@MappedSuperclass", "AuditingEntityListener", "GenerationType.IDENTITY", "softDelete", "equals/hashCode"):
+            if marker not in text:
+                fail(f"JPA BaseEntity policy must mention {marker}: {path}")
+
+    route_text = read(ROOT / "scripts" / "route-user-prompt.py")
+    for marker in ("base-entity", "jpa-base-entity", "BaseEntity", "MappedSuperclass", "softDelete"):
+        if marker not in route_text:
+            fail(f"JPA BaseEntity routing must mention {marker}")
+
+    cases_text = read(ROOT / "tests" / "eval" / "routing" / "test-cases.json")
+    for marker in ("jpa-base-entity", "BaseEntity", "softDelete"):
+        if marker not in cases_text:
+            fail(f"JPA BaseEntity routing fixture must mention {marker}")
+
+
 def main() -> None:
     assert_unique_case_ids()
     assert_hook_policy()
@@ -246,7 +345,10 @@ def main() -> None:
     assert_test_db_and_controller_policy()
     assert_jpa_scalar_fk_relation_policy()
     assert_repository_port_core_adapter_policy()
+    assert_jpa_entity_domain_boundary_policy()
     assert_api_response_contract_policy()
+    assert_spring_persistence_config_policy()
+    assert_jpa_base_entity_policy()
     print("guardrail policy tests passed")
 
 
