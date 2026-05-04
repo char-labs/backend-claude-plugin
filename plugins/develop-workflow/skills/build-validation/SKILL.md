@@ -21,13 +21,13 @@ argument-hint: "[빌드, CI, 검증 작업]"
 
 1. build file, wrapper, module, generated-source task, existing script를 확인한다.
 2. 실패 유형을 분류한다: dependency resolution, source compile, generated source, test, lint/static analysis, environment, CI-only.
-3. 가장 좁은 관련 명령부터 실행하거나 제안한다.
+3. Gradle module은 편집 파일에서 root 방향으로 가장 가까운 `build.gradle.kts` 또는 `build.gradle`을 찾아 추정하고, 가장 좁은 관련 명령부터 실행하거나 제안한다.
 4. protobuf/API generation 변경이면 consumer module보다 generator module을 먼저 검증한다.
 5. 도구를 자동 설치하지 않고, 필요한 추가 도구는 근거와 함께 제안한다.
 
 ## 검증
 
-- JVM 기본: `./gradlew :{module}:compileKotlin`, `./gradlew :{module}:test`
+- JVM 기본: `./gradlew :{module}:compileKotlin`, Kotlin test source 변경이면 `./gradlew :{module}:compileTestKotlin`, 동작 검증이면 `./gradlew :{module}:test`
 - Proto 기본: `./gradlew :protobuf:build` 후 소비 모듈 검증
 
 ## 주의사항

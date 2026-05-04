@@ -159,6 +159,12 @@ def main() -> None:
         "backend-test-writer",
         "backend-test-strategy",
     )
+    assert_route(
+        "routes Kotlin workflow work",
+        "Refactor this Kotlin service to use nullability, sealed classes, and scope functions idiomatically",
+        "kotlin-specialist",
+        "kotlin-backend-workflow",
+    )
     assert_no_route("does not route simple git request", "git log recent 5 commits")
     print("hook tests passed")
 

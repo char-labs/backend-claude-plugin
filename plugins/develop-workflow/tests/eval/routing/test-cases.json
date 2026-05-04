@@ -238,6 +238,20 @@
     "expected_skill": "migration-adr"
   },
   {
+    "id": "KT01",
+    "type": "direct",
+    "prompt": "Refactor this Kotlin service to use nullability, sealed classes, extension functions, and scope functions idiomatically",
+    "expected_agent": "kotlin-specialist",
+    "expected_skill": "kotlin-backend-workflow"
+  },
+  {
+    "id": "KT02",
+    "type": "korean",
+    "prompt": "코틀린 서비스에서 nullability와 sealed class, 확장 함수를 코틀린답게 정리해줘",
+    "expected_agent": "kotlin-specialist",
+    "expected_skill": "kotlin-backend-workflow"
+  },
+  {
     "id": "C01",
     "type": "direct",
     "prompt": "Review this Spring Kotlin coroutineScope code and check Dispatchers.IO for blocking calls",

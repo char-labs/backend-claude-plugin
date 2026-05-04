@@ -14,6 +14,8 @@
 
 - Kotlin nullability를 contract로 사용한다. invariant가 locally 증명되고 더 나은 type으로 표현할 수 없는 경우가 아니라면 `!!`를 피한다.
 - request command와 value object에는 immutable data를 우선한다.
+- sealed class/interface, enum, value class, data class, extension function은 domain state와 call-site intent를 더 선명하게 만들 때 우선한다.
+- coroutine, Flow, StateFlow/SharedFlow, reactive pipeline은 cancellation, backpressure, state ownership, dispatcher 선택을 함께 검토할 수 있을 때 사용한다.
 - extension function은 discoverable하고 domain-relevant하게 유지한다. 중요한 dependency를 extension 안에 숨기지 않는다.
 - 여러 class에 private helper나 흩어진 method pattern이 나타날 가능성이 높다면 공통 operation을 추론해 top-level extension function으로 추출한다.
 - 넓게 재사용되는 extension function은 프로젝트의 기존 `common`, `support`, `util` package에 둔다. convention이 domain-local이면 global dumping ground를 만들지 말고 domain support package를 사용한다.
@@ -157,6 +159,7 @@ data class NewFlowerEvent(
 ## Gradle과 검증
 
 - `./gradlew test`, `./gradlew ktlintCheck`, `./gradlew detekt`, project-specific task가 있으면 repo wrapper를 우선한다.
+- Kotlin 테스트 파일 변경 후에는 편집 파일에서 root 방향으로 가장 가까운 Gradle module을 추정해 `./gradlew :{module}:compileTestKotlin` 같은 좁은 compile validation을 우선한다.
 - plugin이나 dependency를 자동으로 추가하지 않는다. 추가가 필요하면 근거와 함께 추천한다.
 - module path가 있으면 먼저 affected module로 validation scope를 좁히고, shared contract가 바뀐 경우에만 넓힌다.
 
